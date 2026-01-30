@@ -3,32 +3,6 @@ import { TOWERS } from '../data/towers';
 
 const TILE_SIZE = 64;
 
-// ...
-
-// (Inside render method where we left off)
-// Preview Range
-if (state.uiState.previewTowerId && !state.selection.towerId) {
-    const cx = x * TILE_SIZE + TILE_SIZE / 2;
-    const cy = y * TILE_SIZE + TILE_SIZE / 2;
-    const data = TOWERS[state.uiState.previewTowerId];
-    if (data) {
-        const range = data.tiers[0].stats.range * TILE_SIZE;
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, range, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.setLineDash([5, 5]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-    }
-}
-    }
-
-ctx.restore();
-  }
-
 // Modern "Dark Cyber" Palette
 const COLORS = {
     bg: '#020617', // Slate-950
@@ -62,10 +36,13 @@ export class Renderer {
 
         ctx.save();
 
-        // Auto Center Camera (Fixed)
+        // Layout Layout
+        const SIDEBAR_WIDTH = 260; // Sidebar on Left
+        const playableW = width - SIDEBAR_WIDTH;
         const boardW = map.width * TILE_SIZE;
         const boardH = map.height * TILE_SIZE;
-        const paddingX = (width - boardW) / 2;
+
+        const paddingX = SIDEBAR_WIDTH + (playableW - boardW) / 2;
         const paddingY = (height - boardH) / 2;
 
         ctx.translate(paddingX, paddingY);
@@ -84,10 +61,29 @@ export class Renderer {
             const { x, y } = state.selection.tile;
             ctx.strokeStyle = '#22d3ee'; // Cyan-400
             ctx.lineWidth = 3;
-            ctx.shadowColor = '#22d3ee';
-            ctx.shadowBlur = 15;
+            // ctx.shadowColor = '#22d3ee'; // Performance cost high?
+            // ctx.shadowBlur = 15;
             ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-            ctx.shadowBlur = 0;
+            // ctx.shadowBlur = 0;
+
+            // Preview Range
+            if (state.uiState.previewTowerId && !state.selection.towerId) {
+                const cx = x * TILE_SIZE + TILE_SIZE / 2;
+                const cy = y * TILE_SIZE + TILE_SIZE / 2;
+                const data = TOWERS[state.uiState.previewTowerId];
+                if (data) {
+                    const range = data.tiers[0].stats.range * TILE_SIZE;
+
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, range, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
         }
 
         ctx.restore();

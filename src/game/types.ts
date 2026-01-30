@@ -54,6 +54,7 @@ export interface TowerTier {
 export interface TowerData {
   id: TowerType;
   name: string;
+  unlockWave?: number;
   tiers: [TowerTier, TowerTier, TowerTier]; // Always 3 tiers
 }
 
