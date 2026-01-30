@@ -63,9 +63,8 @@ export class GameManager {
     private onRender() {
         this.renderer?.render(this.state);
         this.tickCount++;
-        if (this.tickCount % 6 === 0) {
-            this.onStateChangeCallback?.(this.state, this.tickCount);
-        }
+        // Call state change callback every frame to ensure UI updates
+        this.onStateChangeCallback?.(this.state, this.tickCount);
     }
 
     private handleTileSelect(x: number, y: number) {
