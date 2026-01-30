@@ -35,17 +35,30 @@ export default function HUD() {
     return (
         <>
             <div className="absolute top-0 left-0 w-full p-4 pointer-events-none flex justify-between items-start select-none z-10">
-                {/* Left Pill: Wave & Lives */}
+                {/* Left: Wave only */}
                 <div className="flex flex-col gap-3 pointer-events-auto">
-                    <div className="flex items-center gap-4">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3 min-w-[120px]">
-                            <WaveIcon />
-                            <div className="flex flex-col leading-none">
-                                <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">Defense</span>
-                                <span className="text-xl font-black text-white">WAVE {state.wave}</span>
+                    <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3 min-w-[120px]">
+                        <WaveIcon />
+                        <div className="flex flex-col leading-none">
+                            <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">Defense</span>
+                            <span className="text-xl font-black text-white">WAVE {state.wave}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right: Gold, Lives & Controls */}
+                <div className="flex flex-col gap-3 pointer-events-auto items-end">
+                    <div className="flex items-center gap-3">
+                        {/* Gold */}
+                        <div className="bg-black/40 backdrop-blur-md border border-white/10 px-5 py-2 rounded-2xl shadow-xl flex items-center gap-3">
+                            <div className="flex flex-col items-end leading-none">
+                                <span className="text-[10px] text-yellow-200 font-bold uppercase tracking-wider opacity-70">Treasury</span>
+                                <span className="text-xl font-black text-yellow-400 tabular-nums">{state.gold}</span>
                             </div>
+                            <GoldIcon />
                         </div>
 
+                        {/* Lives */}
                         <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3">
                             <HeartIcon />
                             <div className="flex flex-col leading-none">
@@ -53,17 +66,6 @@ export default function HUD() {
                                 <span className={`text-xl font-black ${state.lives < 5 ? 'text-rose-500 animate-pulse' : 'text-white'}`}>{state.lives}</span>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* Right Pill: Gold & Controls */}
-                <div className="flex flex-col gap-3 pointer-events-auto items-end">
-                    <div className="bg-black/40 backdrop-blur-md border border-white/10 px-5 py-2 rounded-2xl shadow-xl flex items-center gap-3">
-                        <div className="flex flex-col items-end leading-none">
-                            <span className="text-[10px] text-yellow-200 font-bold uppercase tracking-wider opacity-70">Treasury</span>
-                            <span className="text-xl font-black text-yellow-400 tabular-nums">{state.gold}</span>
-                        </div>
-                        <GoldIcon />
                     </div>
 
                     <button
