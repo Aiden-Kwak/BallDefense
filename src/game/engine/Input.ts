@@ -6,6 +6,7 @@ export class InputHandler {
     private state: GameState;
 
     // Panning
+    private isDown = false;
     private isDragging = false;
     private lastX = 0;
     private lastY = 0;
@@ -86,6 +87,7 @@ export class InputHandler {
     // --- Logic ---
 
     public handleStart(x: number, y: number) {
+        this.isDown = true;
         this.startX = x;
         this.startY = y;
         this.isDragging = false;
@@ -94,6 +96,8 @@ export class InputHandler {
     }
 
     public handleMove(x: number, y: number) {
+        if (!this.isDown) return;
+
         const dist = Math.abs(x - this.startX) + Math.abs(y - this.startY);
         if (dist > 10) {
             this.isDragging = true;
@@ -110,9 +114,10 @@ export class InputHandler {
     }
 
     public handleEnd(x: number, y: number) {
-        if (!this.isDragging) {
+        if (!this.isDragging && this.isDown) { // Ensure it was a valid press
             this.handleClick(x, y);
         }
+        this.isDown = false;
         this.isDragging = false;
     }
 
