@@ -129,4 +129,3 @@ export class InputHandler {
         return { tileX, tileY };
     }
 }
-}
