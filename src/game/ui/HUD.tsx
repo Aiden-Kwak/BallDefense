@@ -86,13 +86,15 @@ export default function HUD() {
             {/* Center Status / Start Button */}
             <div className="absolute top-24 left-1/2 -translate-x-1/2 w-full px-8 pointer-events-none z-20 flex justify-center flex-col items-center gap-4">
 
-                {/* AUTO START COUNTDOWN */}
+                {/* AUTO START COUNTDOWN (Removed as per request for immediate transition) */}
+                {/* 
                 {state.waveState.intermissionTimer > 0 && !state.waveActive && (
                     <div className="bg-black/60 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/20 animate-pulse text-center">
                         <div className="text-cyan-400 font-bold text-sm tracking-widest uppercase mb-1">Next Wave In</div>
                         <div className="text-4xl font-black text-white">{Math.ceil(state.waveState.intermissionTimer)}</div>
                     </div>
                 )}
+                */}
 
                 {/* START BUTTON (Only for Wave 1) */}
                 {!state.waveActive && state.wave === 1 && state.waveState.intermissionTimer <= 0 && (

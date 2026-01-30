@@ -99,8 +99,8 @@ export class WaveSystem {
         state.gold += bonus;
         state.wave++;
 
-        // Start Intermission (3 seconds)
-        state.waveState.intermissionTimer = 3.0;
+        // Start Intermission (Quick transition)
+        state.waveState.intermissionTimer = 0.5; // Enough to see "Wave Complete" visual if we had one, but effectively instant for user flow.
     }
 
     private spawnEnemy(state: GameState, enemyId: string) {

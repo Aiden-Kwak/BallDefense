@@ -108,7 +108,7 @@ export class GameManager {
         const data = TOWERS[towerId];
         if (!data) return;
 
-        const cost = data.tiers[0].stats.cost;
+        const cost = Number(data.tiers[0].stats.cost);
         if (this.state.gold >= cost) {
             this.state.gold -= cost;
             const newTower: TowerEntity = {
