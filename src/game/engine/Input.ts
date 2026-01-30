@@ -5,120 +5,24 @@ export class InputHandler {
     private canvas: HTMLCanvasElement;
     private state: GameState;
 
-    // Panning
+    // Panning (Disabled by user request)
     private isDown = false;
-    private isDragging = false;
-    private lastX = 0;
-    private lastY = 0;
-    private startX = 0;
-    private startY = 0;
 
-    // Interaction callbacks
-    public onTileSelect?: (x: number, y: number) => void;
-
-    constructor(canvas: HTMLCanvasElement, state: GameState) {
-        this.canvas = canvas;
-        this.state = state;
-        this.attachListeners();
-    }
-
-    private attachListeners() {
-        // Mouse
-        this.canvas.addEventListener('mousedown', this.onPointerDown);
-        this.canvas.addEventListener('mousemove', this.onPointerMove);
-        this.canvas.addEventListener('mouseup', this.onPointerUp);
-        this.canvas.addEventListener('mouseleave', this.onPointerUp);
-
-        // Touch
-        this.canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
-        this.canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
-        this.canvas.addEventListener('touchend', this.onTouchEnd);
-    }
-
-    public cleanup() {
-        this.canvas.removeEventListener('mousedown', this.onPointerDown);
-        this.canvas.removeEventListener('mousemove', this.onPointerMove);
-        this.canvas.removeEventListener('mouseup', this.onPointerUp);
-        this.canvas.removeEventListener('mouseleave', this.onPointerUp);
-
-        this.canvas.removeEventListener('touchstart', this.onTouchStart);
-        this.canvas.removeEventListener('touchmove', this.onTouchMove);
-        this.canvas.removeEventListener('touchend', this.onTouchEnd);
-    }
-
-    // --- Pointer Handlers ---
-
-    private onPointerDown = (e: MouseEvent) => {
-        e.preventDefault();
-        this.handleStart(e.clientX, e.clientY);
-    };
-
-    private onPointerMove = (e: MouseEvent) => {
-        e.preventDefault();
-        this.handleMove(e.clientX, e.clientY);
-    };
-
-    private onPointerUp = (e: MouseEvent) => {
-        e.preventDefault();
-        this.handleEnd(e.clientX, e.clientY);
-    };
-
-    private onTouchStart = (e: TouchEvent) => {
-        e.preventDefault();
-        if (e.touches.length === 1) {
-            const t = e.touches[0];
-            this.handleStart(t.clientX, t.clientY);
-        }
-    };
-
-    private onTouchMove = (e: TouchEvent) => {
-        e.preventDefault();
-        if (e.touches.length === 1) {
-            const t = e.touches[0];
-            this.handleMove(t.clientX, t.clientY);
-        }
-    };
-
-    private onTouchEnd = (e: TouchEvent) => {
-        const t = e.changedTouches[0];
-        this.handleEnd(t.clientX, t.clientY);
-    };
-
-    // --- Logic ---
+    // ...
 
     public handleStart(x: number, y: number) {
         this.isDown = true;
-        this.startX = x;
-        this.startY = y;
-        this.isDragging = false;
-        this.lastX = x;
-        this.lastY = y;
     }
 
     public handleMove(x: number, y: number) {
-        if (!this.isDown) return;
-
-        const dist = Math.abs(x - this.startX) + Math.abs(y - this.startY);
-        if (dist > 10) {
-            this.isDragging = true;
-        }
-
-        if (this.isDragging) {
-            const dx = x - this.lastX;
-            const dy = y - this.lastY;
-            this.state.camera.x += dx;
-            this.state.camera.y += dy;
-            this.lastX = x;
-            this.lastY = y;
-        }
+        // No Camera Movement
     }
 
     public handleEnd(x: number, y: number) {
-        if (!this.isDragging && this.isDown) { // Ensure it was a valid press
+        if (this.isDown) {
             this.handleClick(x, y);
         }
         this.isDown = false;
-        this.isDragging = false;
     }
 
     private handleClick(screenX: number, screenY: number) {

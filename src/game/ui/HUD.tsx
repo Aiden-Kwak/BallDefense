@@ -72,6 +72,14 @@ export default function HUD() {
                     >
                         {state.paused ? '▶' : 'II'}
                     </button>
+
+                    <button
+                        onClick={() => gameManager.resetGame()}
+                        className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 backdrop-blur-md border border-red-500/30 flex items-center justify-center text-red-200 transition-all active:scale-90"
+                        title="Restart Game"
+                    >
+                        ↻
+                    </button>
                 </div>
             </div>
 

@@ -27,19 +27,21 @@ export class Renderer {
 
     public render(state: GameState) {
         const { ctx, width, height } = this;
-        const { map, camera } = state;
+        const { map } = state;
 
-        // Clear with bg
+        // Clear
         ctx.fillStyle = COLORS.bg;
         ctx.fillRect(0, 0, width, height);
 
         ctx.save();
 
-        // Camera Transform
-        ctx.translate(camera.x + width / 2, camera.y + height / 2);
+        // Auto Center Camera (Fixed)
         const boardW = map.width * TILE_SIZE;
         const boardH = map.height * TILE_SIZE;
-        ctx.translate(-boardW / 2, -boardH / 2);
+        const paddingX = (width - boardW) / 2;
+        const paddingY = (height - boardH) / 2;
+
+        ctx.translate(paddingX, paddingY);
 
         // Draw Map Layers
         this.drawGrid(state);
@@ -76,16 +78,13 @@ export class Renderer {
             for (let x = 0; x < map.width; x++) {
                 const isPath = map.grid[y][x] === 1;
 
-                // Tile BG
                 ctx.fillStyle = isPath ? '#0f172a' : '#1e293b';
                 ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
-                // Grid Lines
                 ctx.strokeStyle = '#334155';
                 ctx.lineWidth = 1;
                 ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
-                // Path Decor (Dots)
                 if (isPath) {
                     ctx.fillStyle = '#334155';
                     ctx.beginPath();
@@ -108,7 +107,7 @@ export class Renderer {
             ctx.ellipse(cx, cy + 12, 12, 6, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Body (Glow)
+            // Body
             const color = this.getEnemyColor(enemy.typeId);
             ctx.shadowColor = color;
             ctx.shadowBlur = 10;
@@ -118,21 +117,12 @@ export class Renderer {
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // Inner detail (Eye)
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            ctx.arc(cx, cy, 5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // HP Bar (Floating)
+            // HP Bar
             const hpPct = enemy.hp / enemy.maxHp;
             const barW = 30;
             const barY = cy - 24;
-
-            // Bg
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(cx - barW / 2, barY, barW, 4);
-            // Fg
             ctx.fillStyle = hpPct > 0.5 ? '#22c55e' : '#ef4444';
             ctx.fillRect(cx - barW / 2, barY, barW * hpPct, 4);
         }
@@ -140,12 +130,12 @@ export class Renderer {
 
     private getEnemyColor(typeId: string): string {
         switch (typeId) {
-            case 'GRUNT': return '#60a5fa'; // Blue
-            case 'RUNNER': return '#f87171'; // Red
-            case 'BRUTE': return '#34d399'; // Green
-            case 'SWARM': return '#fcd34d'; // Amber
-            case 'WARDED': return '#c084fc'; // Purple
-            case 'SHIELDED': return '#f472b6'; // Pink
+            case 'GRUNT': return '#60a5fa';
+            case 'RUNNER': return '#f87171';
+            case 'BRUTE': return '#34d399';
+            case 'SWARM': return '#fcd34d';
+            case 'WARDED': return '#c084fc';
+            case 'SHIELDED': return '#f472b6';
             default: return '#fff';
         }
     }
@@ -159,23 +149,79 @@ export class Renderer {
             const cy = y + TILE_SIZE / 2;
 
             // Base Platform
-            ctx.fillStyle = '#475569';
-            ctx.fillRect(x + 8, y + 8, TILE_SIZE - 16, TILE_SIZE - 16);
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(x + 6, y + 6, TILE_SIZE - 12, TILE_SIZE - 12);
 
-            // Turret Body
+            // Unique Tower Shapes
             ctx.fillStyle = this.getTowerColor(tower.typeId);
-            ctx.beginPath();
-            ctx.arc(cx, cy, 18, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.shadowColor = this.getTowerColor(tower.typeId);
+            ctx.shadowBlur = 10;
 
-            // Tier Indicators (dots)
+            this.drawTowerShape(ctx, cx, cy, tower.typeId);
+
+            ctx.shadowBlur = 0;
+
+            // Tier Indicators
             ctx.fillStyle = '#fff';
             for (let i = 0; i < tower.tier; i++) {
                 ctx.beginPath();
-                ctx.arc(cx - 8 + (i * 8), cy - 6, 2, 0, Math.PI * 2);
+                ctx.arc(cx - 8 + (i * 8), cy - 12, 2, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
+    }
+
+    private drawTowerShape(ctx: CanvasRenderingContext2D, cx: number, cy: number, typeId: string) {
+        ctx.beginPath();
+        switch (typeId) {
+            case 'ARROW': // Triangle
+                ctx.moveTo(cx, cy - 15);
+                ctx.lineTo(cx + 12, cy + 10);
+                ctx.lineTo(cx - 12, cy + 10);
+                ctx.closePath();
+                break;
+            case 'CANNON': // Square
+                ctx.rect(cx - 12, cy - 12, 24, 24);
+                break;
+            case 'FROST': // Hexagon
+                for (let i = 0; i < 6; i++) {
+                    const angle = i * Math.PI / 3;
+                    const px = cx + 14 * Math.cos(angle);
+                    const py = cy + 14 * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                break;
+            case 'POISON': // Drop / Diamond
+                ctx.moveTo(cx, cy - 16);
+                ctx.lineTo(cx + 12, cy);
+                ctx.lineTo(cx, cy + 16);
+                ctx.lineTo(cx - 12, cy);
+                ctx.closePath();
+                break;
+            case 'ARCANE': // Star
+                // Simple Star
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                    const px = cx + 15 * Math.cos(angle);
+                    const py = cy + 15 * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                break;
+            case 'TESLA': // Lightning / Jagged
+                ctx.moveTo(cx - 5, cy - 15);
+                ctx.lineTo(cx + 5, cy - 5);
+                ctx.lineTo(cx - 2, cy - 5);
+                ctx.lineTo(cx + 8, cy + 15);
+                ctx.lineTo(cx - 3, cy + 3);
+                ctx.lineTo(cx + 5, cy + 3);
+                ctx.closePath();
+                break;
+            default:
+                ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+        }
+        ctx.fill();
     }
 
     private getTowerColor(typeId: string): string {
@@ -198,11 +244,26 @@ export class Renderer {
 
             ctx.shadowColor = '#fff';
             ctx.shadowBlur = 5;
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = '#fff'; // White core
 
+            // Trace/Tail effect handled nicely by shadow or just simple circle
             ctx.beginPath();
-            ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-            ctx.fill();
+            if (proj.type === 'CANNON') {
+                ctx.fillStyle = '#000';
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            } else if (proj.type === 'MAGIC') {
+                ctx.fillStyle = '#d8b4fe';
+                ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                ctx.fillStyle = '#fff';
+                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
             ctx.shadowBlur = 0;
         }
     }
@@ -213,19 +274,20 @@ export class Renderer {
             if (ef.type === 'EXPLOSION') {
                 const cx = ef.pos.x * TILE_SIZE + TILE_SIZE / 2;
                 const cy = ef.pos.y * TILE_SIZE + TILE_SIZE / 2;
-                ctx.fillStyle = `rgba(239, 68, 68, ${ef.timer * 3})`; // Fade out
+                ctx.fillStyle = `rgba(239, 68, 68, ${ef.timer * 3})`;
                 ctx.beginPath();
-                ctx.arc(cx, cy, 30 * (1 - ef.timer), 0, Math.PI * 2); // Expand
+                ctx.arc(cx, cy, 40 * (1 - ef.timer), 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            if (ef.type === 'HIT') {
+            if (ef.type === 'HIT' || ef.type === 'HARM') {
                 const cx = ef.pos.x * TILE_SIZE + TILE_SIZE / 2;
                 const cy = ef.pos.y * TILE_SIZE + TILE_SIZE / 2;
-                ctx.fillStyle = `rgba(255, 255, 255, ${ef.timer * 5})`;
+                ctx.strokeStyle = `rgba(255, 255, 255, ${ef.timer * 4})`;
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(cx, cy, 10 * (1 - ef.timer), 0, Math.PI * 2);
-                ctx.fill();
+                ctx.arc(cx, cy, 20 * (1 - ef.timer), 0, Math.PI * 2); // Ripple
+                ctx.stroke();
             }
         }
     }
