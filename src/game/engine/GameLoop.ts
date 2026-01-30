@@ -58,6 +58,7 @@ export class GameLoop {
         if (this.state.lives <= 0) return;
 
         this.waveSystem.update(this.state, dt);
+        this.waveSystem.updateIntermission(this.state, dt); // Drive auto-wave logic
         this.enemySystem.update(this.state, dt);
         this.towerSystem.update(this.state, dt);
         this.projectileSystem.update(this.state, dt);

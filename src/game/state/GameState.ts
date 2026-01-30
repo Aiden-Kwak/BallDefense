@@ -61,6 +61,7 @@ export interface GameState {
         spawnedCount: number;
         timer: number;
         delaying: boolean;
+        intermissionTimer: number; // For auto-next wave
     };
 
     // Input/Camera
@@ -108,6 +109,7 @@ export const createInitialState = (map: MapData): GameState => ({
         spawnedCount: 0,
         timer: 0,
         delaying: false,
+        intermissionTimer: 0,
     },
     camera: { x: 0, y: 0, zoom: 1 },
     selection: null,

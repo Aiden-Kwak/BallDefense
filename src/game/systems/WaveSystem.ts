@@ -65,6 +65,17 @@ export class WaveSystem {
         }
     }
 
+    public updateIntermission(state: GameState, dt: number) {
+        if (state.waveActive || state.wave <= 1) return; // Wave 1 requires manual start
+
+        if (state.waveState.intermissionTimer > 0) {
+            state.waveState.intermissionTimer -= dt;
+            if (state.waveState.intermissionTimer <= 0) {
+                this.startNextWave(state);
+            }
+        }
+    }
+
     public startNextWave(state: GameState) {
         if (state.waveActive) return;
         state.waveActive = true;
@@ -73,6 +84,7 @@ export class WaveSystem {
         state.waveState.segmentIndex = 0;
         state.waveState.spawnedCount = 0;
         state.waveState.timer = 0;
+        state.waveState.intermissionTimer = 0;
 
         const waveData = WAVES[state.wave - 1];
         if (waveData && waveData.segments[0].delay) {
@@ -86,6 +98,9 @@ export class WaveSystem {
         state.waveActive = false;
         state.gold += bonus;
         state.wave++;
+
+        // Start Intermission (3 seconds)
+        state.waveState.intermissionTimer = 3.0;
     }
 
     private spawnEnemy(state: GameState, enemyId: string) {

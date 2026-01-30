@@ -83,21 +83,37 @@ export default function HUD() {
                 </div>
             </div>
 
-            {/* Floating Action Button: Next Wave */}
-            {!state.waveActive && (
-                <div className="absolute top-24 left-1/2 -translate-x-1/2 w-full px-8 pointer-events-none z-20 flex justify-center">
+            {/* Center Status / Start Button */}
+            <div className="absolute top-24 left-1/2 -translate-x-1/2 w-full px-8 pointer-events-none z-20 flex justify-center flex-col items-center gap-4">
+
+                {/* AUTO START COUNTDOWN */}
+                {state.waveState.intermissionTimer > 0 && !state.waveActive && (
+                    <div className="bg-black/60 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/20 animate-pulse text-center">
+                        <div className="text-cyan-400 font-bold text-sm tracking-widest uppercase mb-1">Next Wave In</div>
+                        <div className="text-4xl font-black text-white">{Math.ceil(state.waveState.intermissionTimer)}</div>
+                    </div>
+                )}
+
+                {/* START BUTTON (Only for Wave 1) */}
+                {!state.waveActive && state.wave === 1 && state.waveState.intermissionTimer <= 0 && (
                     <button
                         onClick={handleNextWave}
                         className="pointer-events-auto group relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold py-3 px-10 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-white/20 transition-all active:scale-95 animate-bounce-subtle"
                     >
                         <span className="relative z-10 flex items-center gap-2">
-                            <span className="text-lg tracking-widest">START</span>
-                            <span className="bg-white/20 px-2 py-0.5 rounded text-sm">WAVE {state.wave}</span>
+                            <span className="text-lg tracking-widest">START GAME</span>
                         </span>
                         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                     </button>
-                </div>
-            )}
+                )}
+
+                {/* WAVE STATUS (During Wave) */}
+                {state.waveActive && (
+                    <div className="bg-black/40 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
+                        <span className="text-xl font-black text-white tracking-widest">WAVE {state.wave}</span>
+                    </div>
+                )}
+            </div>
 
             {/* Pause Overlay */}
             {state.paused && (
