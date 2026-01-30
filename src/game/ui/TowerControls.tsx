@@ -69,13 +69,21 @@ export default function TowerControls() {
                             <button
                                 onClick={handleUpgrade}
                                 disabled={state.gold < nextTier.stats.cost}
-                                className={`w-full py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-between border
+                                className={`w-full py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-between border group relative
                                 ${state.gold >= nextTier.stats.cost
                                         ? 'bg-indigo-600 hover:bg-indigo-500 border-indigo-400 text-white shadow-lg shadow-indigo-500/20'
                                         : 'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed'}`}
                             >
                                 <span>UPGRADE</span>
-                                <span className={state.gold >= nextTier.stats.cost ? 'text-indigo-200' : ''}>-{nextTier.stats.cost}G</span>
+                                <div className="text-right flex flex-col items-end">
+                                    <span className={state.gold >= nextTier.stats.cost ? 'text-indigo-200' : ''}>-{nextTier.stats.cost}G</span>
+                                    {/* Tooltip / Diff - Just showing improved stats inline as mini-text */}
+                                    <div className="absolute top-full left-0 right-0 bg-indigo-900/90 backdrop-blur p-2 hidden group-hover:flex justify-around text-[10px] text-white pointer-events-none border-t border-white/10 z-20">
+                                        {nextTier.stats.damage > currentTier.stats.damage && <span>DMG: <span className="text-green-400">+{Math.round(nextTier.stats.damage - currentTier.stats.damage)}</span></span>}
+                                        {nextTier.stats.fireRate > currentTier.stats.fireRate && <span>SPD: <span className="text-green-400">+{Math.round((nextTier.stats.fireRate - currentTier.stats.fireRate) * 100) / 100}</span></span>}
+                                        {nextTier.stats.range > currentTier.stats.range && <span>RNG: <span className="text-green-400">+{Math.round((nextTier.stats.range - currentTier.stats.range) * 10) / 10}</span></span>}
+                                    </div>
+                                </div>
                             </button>
                         ) : (
                             <div className="w-full py-3 text-center bg-white/5 border border-white/5 rounded-xl text-slate-500 font-bold uppercase tracking-widest text-xs">

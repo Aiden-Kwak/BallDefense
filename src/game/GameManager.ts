@@ -33,6 +33,7 @@ export class GameManager {
 
         this.input = new InputHandler(canvas, this.state);
         this.input.onTileSelect = this.handleTileSelect.bind(this);
+        this.input.onTileHover = this.handleTileHover.bind(this);
 
         // Attempt Load
         if (this.loadGame()) {

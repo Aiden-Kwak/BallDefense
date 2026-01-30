@@ -10,6 +10,7 @@ export class InputHandler {
 
     // Interaction callbacks
     public onTileSelect?: (x: number, y: number) => void;
+    public onTileHover?: (x: number, y: number) => void;
 
     constructor(canvas: HTMLCanvasElement, state: GameState) {
         this.canvas = canvas;
@@ -70,7 +71,7 @@ export class InputHandler {
         e.preventDefault();
         if (e.touches.length === 1) {
             const t = e.touches[0];
-            // this.handleMove(t.clientX, t.clientY); // Disabled move
+            this.handleMove(t.clientX, t.clientY);
         }
     };
 
@@ -85,53 +86,36 @@ export class InputHandler {
         this.isDown = true;
     }
 
-    public handleMove(x: number, y: number) {
-        // No Camera Movement
+    public handleMove(screenX: number, screenY: number) {
+        const { tileX, tileY } = this.getTileFromScreen(screenX, screenY);
+        this.onTileHover?.(tileX, tileY);
     }
 
     public handleEnd(x: number, y: number) {
         if (this.isDown) { // Simple click detection (no drag check needed as drag is disabled)
-            this.handleClick(x, y);
+            const { tileX, tileY } = this.getTileFromScreen(x, y);
+            this.onTileSelect?.(tileX, tileY);
         }
         this.isDown = false;
     }
 
-    private handleClick(screenX: number, screenY: number) {
-        // NOTE: screenX/Y from clientX/Y can be tricky with scaling.
-        // We really want offset relative to the canvas element.
-        // Since we can't easily get offsetX from here without the event, 
-        // let's rely on the fact that the canvas is full screen (w/h = window.w/h).
-        // BUT, to be absolutely safe and match Renderer exactly:
-
+    private getTileFromScreen(screenX: number, screenY: number) {
         const rect = this.canvas.getBoundingClientRect();
-
-        // Canvas Internal Resolution
         const canvasW = this.canvas.width;
         const canvasH = this.canvas.height;
-
-        // CSS Resolution
         const cssW = rect.width;
         const cssH = rect.height;
-
-        // Scale factors (should be 1 if page.tsx logic works, but safeguards are good)
         const scaleX = canvasW / cssW;
         const scaleY = canvasH / cssH;
 
-        // Position within canvas (internal pixels)
         const canvasX = (screenX - rect.left) * scaleX;
         const canvasY = (screenY - rect.top) * scaleY;
-
-        // --- Renderer Logic Sync ---
-        // Renderer: const paddingX = SIDEBAR_WIDTH + (playableW - boardW) / 2;
-        //           ctx.translate(paddingX, paddingY);
 
         const { state } = this;
         const SIDEBAR_WIDTH = 260;
         const boardW = state.map.width * TILE_SIZE;
         const boardH = state.map.height * TILE_SIZE;
-
-        // IMPORTANT: Use canvasW, not this.canvas.width property directly if it differs
-        const playableW = canvasW - SIDEBAR_WIDTH; // Width remaining for board
+        const playableW = canvasW - SIDEBAR_WIDTH;
 
         const paddingX = SIDEBAR_WIDTH + (playableW - boardW) / 2;
         const paddingY = (canvasH - boardH) / 2;
@@ -142,6 +126,7 @@ export class InputHandler {
         const tileX = Math.floor(worldX / TILE_SIZE);
         const tileY = Math.floor(worldY / TILE_SIZE);
 
-        this.onTileSelect?.(tileX, tileY);
+        return { tileX, tileY };
     }
+}
 }

@@ -86,6 +86,29 @@ export class Renderer {
             }
         }
 
+        // Draw Range for Hovered Tower (Existing)
+        if (state.uiState.hoveredTowerId && !state.selection?.towerId) {
+            const tower = state.towers.find(t => t.id === state.uiState.hoveredTowerId);
+            if (tower) {
+                const cx = tower.pos.x * TILE_SIZE + TILE_SIZE / 2;
+                const cy = tower.pos.y * TILE_SIZE + TILE_SIZE / 2;
+                const data = TOWERS[tower.typeId];
+                if (data) {
+                    const currentTier = data.tiers[tower.tier - 1]; // Use actual tier
+                    const range = currentTier.stats.range * TILE_SIZE;
+
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, range, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+        }
+
         ctx.restore();
     }
 
