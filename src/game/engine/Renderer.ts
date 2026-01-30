@@ -1,6 +1,33 @@
 import { GameState } from '../state/GameState';
+import { TOWERS } from '../data/towers';
 
 const TILE_SIZE = 64;
+
+// ...
+
+// (Inside render method where we left off)
+// Preview Range
+if (state.uiState.previewTowerId && !state.selection.towerId) {
+    const cx = x * TILE_SIZE + TILE_SIZE / 2;
+    const cy = y * TILE_SIZE + TILE_SIZE / 2;
+    const data = TOWERS[state.uiState.previewTowerId];
+    if (data) {
+        const range = data.tiers[0].stats.range * TILE_SIZE;
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, range, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.setLineDash([5, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+}
+    }
+
+ctx.restore();
+  }
 
 // Modern "Dark Cyber" Palette
 const COLORS = {

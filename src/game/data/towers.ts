@@ -4,6 +4,7 @@ export const TOWERS: Record<string, TowerData> = {
     ARROW: {
         id: 'ARROW',
         name: 'Arrow Tower',
+        unlockWave: 1,
         tiers: [
             {
                 tier: 1,
@@ -25,6 +26,7 @@ export const TOWERS: Record<string, TowerData> = {
     CANNON: {
         id: 'CANNON',
         name: 'Cannon',
+        unlockWave: 2,
         tiers: [
             {
                 tier: 1,
@@ -46,6 +48,7 @@ export const TOWERS: Record<string, TowerData> = {
     FROST: {
         id: 'FROST',
         name: 'Frost Spire',
+        unlockWave: 3,
         tiers: [
             {
                 tier: 1,
@@ -67,6 +70,7 @@ export const TOWERS: Record<string, TowerData> = {
     ARCANE: {
         id: 'ARCANE',
         name: 'Arcane Crystal',
+        unlockWave: 5,
         tiers: [
             {
                 tier: 1,
@@ -88,6 +92,7 @@ export const TOWERS: Record<string, TowerData> = {
     POISON: {
         id: 'POISON',
         name: 'Poison Trap',
+        unlockWave: 7,
         tiers: [
             {
                 tier: 1,
@@ -109,6 +114,7 @@ export const TOWERS: Record<string, TowerData> = {
     TESLA: {
         id: 'TESLA',
         name: 'Tesla Coil',
+        unlockWave: 10,
         tiers: [
             {
                 tier: 1,

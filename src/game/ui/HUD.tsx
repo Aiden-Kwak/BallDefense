@@ -38,11 +38,11 @@ export default function HUD() {
                 {/* Left Pill: Wave & Lives */}
                 <div className="flex flex-col gap-3 pointer-events-auto">
                     <div className="flex items-center gap-4">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3">
+                        <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3 min-w-[120px]">
                             <WaveIcon />
                             <div className="flex flex-col leading-none">
-                                <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">Wave</span>
-                                <span className="text-xl font-black text-white">{state.wave}</span>
+                                <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">Defense</span>
+                                <span className="text-xl font-black text-white">WAVE {state.wave}</span>
                             </div>
                         </div>
 

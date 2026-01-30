@@ -209,11 +209,17 @@ export class GameManager {
             this.state.effects.length = 0;
 
             Object.assign(this.state, loaded);
+            this.state.uiState = { previewTowerId: null }; // Reset UI
             return true;
         } catch (e) {
             console.warn("Load failed", e);
             return false;
         }
+    }
+
+    public setPreview(towerId: string | null) {
+        this.state.uiState.previewTowerId = towerId;
+        this.onStateChangeCallback?.(this.state, this.tickCount);
     }
 
     public resetGame() {

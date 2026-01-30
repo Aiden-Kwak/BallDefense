@@ -83,6 +83,11 @@ export interface GameState {
         timer: number;
     }[];
 
+    // UI State
+    uiState: {
+        previewTowerId: string | null;
+    };
+
     // Global Settings (Runtime, not saved maybe? But useful to save)
     speed: number;
     paused: boolean;
@@ -106,6 +111,7 @@ export const createInitialState = (map: MapData): GameState => ({
     },
     camera: { x: 0, y: 0, zoom: 1 },
     selection: null,
+    uiState: { previewTowerId: null },
     effects: [],
     speed: 1,
     paused: false,
