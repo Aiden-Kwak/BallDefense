@@ -31,6 +31,31 @@ const applyPath = (grid: number[][], waypoints: Vector2D[]) => {
     }
 };
 
+// Helper to randomly block N buildable tiles
+// Grid values: 0 = buildable, 1 = path, 2 = blocked
+const applyRandomBlocks = (grid: number[][], count: number) => {
+    const buildableTiles: Vector2D[] = [];
+
+    // Collect all buildable tiles
+    for (let y = 0; y < grid.length; y++) {
+        for (let x = 0; x < grid[y].length; x++) {
+            if (grid[y][x] === 0) {
+                buildableTiles.push({ x, y });
+            }
+        }
+    }
+
+    // Randomly select and block tiles
+    const blockedCount = Math.min(count, buildableTiles.length);
+    for (let i = 0; i < blockedCount; i++) {
+        const randomIndex = Math.floor(Math.random() * buildableTiles.length);
+        const tile = buildableTiles[randomIndex];
+        grid[tile.y][tile.x] = 2; // 2 = blocked
+        buildableTiles.splice(randomIndex, 1); // Remove from available list
+    }
+};
+
+
 // --- Map 1: Beginner S-Path ---
 const map1Waypoints: Vector2D[] = [
     { x: 1, y: 0 }, // Start Top-Leftish
@@ -44,6 +69,8 @@ const map1Waypoints: Vector2D[] = [
 ];
 const map1Grid = createGrid(WIDTH, HEIGHT);
 applyPath(map1Grid, map1Waypoints);
+applyRandomBlocks(map1Grid, 10);
+
 
 // --- Map 2: Split & Merge ---
 // Start Top-mid, split to sides, merge Bottom-mid
@@ -97,6 +124,8 @@ const map2Waypoints: Vector2D[] = [
 ];
 const map2Grid = createGrid(WIDTH, HEIGHT);
 applyPath(map2Grid, map2Waypoints);
+applyRandomBlocks(map2Grid, 10);
+
 
 // --- Map 3: Long Spiral ---
 const map3Waypoints: Vector2D[] = [
@@ -112,6 +141,8 @@ const map3Waypoints: Vector2D[] = [
 ];
 const map3Grid = createGrid(WIDTH, HEIGHT);
 applyPath(map3Grid, map3Waypoints);
+applyRandomBlocks(map3Grid, 10);
+
 
 export const MAPS: MapData[] = [
     {

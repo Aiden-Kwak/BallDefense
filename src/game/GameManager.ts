@@ -92,6 +92,7 @@ export class GameManager {
         if (tower) {
             this.state.selection = { tile: { x, y }, towerId: tower.id };
         } else {
+            // 0 = buildable, 1 = path, 2 = blocked
             if (this.state.map.grid[y][x] === 0) {
                 this.state.selection = { tile: { x, y } };
             } else {
@@ -99,6 +100,18 @@ export class GameManager {
             }
         }
         this.onStateChangeCallback?.(this.state, this.tickCount);
+    }
+
+    private handleTileHover(x: number, y: number) {
+        // Find tower at this position
+        const tower = this.state.towers.find(t => t.pos.x === x && t.pos.y === y);
+        const newHoverId = tower ? tower.id : null;
+
+        if (this.state.uiState.hoveredTowerId !== newHoverId) {
+            this.state.uiState.hoveredTowerId = newHoverId;
+            // Force render update if hover changes
+            this.onStateChangeCallback?.(this.state, this.tickCount);
+        }
     }
 
     public buildTower(towerId: string) {
@@ -210,7 +223,7 @@ export class GameManager {
             this.state.effects.length = 0;
 
             Object.assign(this.state, loaded);
-            this.state.uiState = { previewTowerId: null }; // Reset UI
+            this.state.uiState = { previewTowerId: null, hoveredTowerId: null }; // Reset UI
             return true;
         } catch (e) {
             console.warn("Load failed", e);

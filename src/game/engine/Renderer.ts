@@ -122,20 +122,43 @@ export class Renderer {
 
         for (let y = 0; y < map.height; y++) {
             for (let x = 0; x < map.width; x++) {
-                const isPath = map.grid[y][x] === 1;
+                const cellValue = map.grid[y][x];
+                const isPath = cellValue === 1;
+                const isBlocked = cellValue === 2;
 
-                ctx.fillStyle = isPath ? '#0f172a' : '#1e293b';
+                // Color scheme: buildable (dark blue), path (darker blue), blocked (red/orange)
+                if (isBlocked) {
+                    ctx.fillStyle = '#3f1f1f'; // Dark red background
+                } else if (isPath) {
+                    ctx.fillStyle = '#0f172a'; // Path color
+                } else {
+                    ctx.fillStyle = '#1e293b'; // Buildable color
+                }
+
                 ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
-                ctx.strokeStyle = '#334155';
+                // Border
+                ctx.strokeStyle = isBlocked ? '#7f1d1d' : '#334155';
                 ctx.lineWidth = 1;
                 ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
+                // Visual indicators
                 if (isPath) {
                     ctx.fillStyle = '#334155';
                     ctx.beginPath();
                     ctx.arc(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 4, 0, Math.PI * 2);
                     ctx.fill();
+                } else if (isBlocked) {
+                    // Draw X pattern for blocked tiles
+                    ctx.strokeStyle = '#dc2626';
+                    ctx.lineWidth = 2;
+                    const padding = TILE_SIZE * 0.3;
+                    ctx.beginPath();
+                    ctx.moveTo(x * TILE_SIZE + padding, y * TILE_SIZE + padding);
+                    ctx.lineTo(x * TILE_SIZE + TILE_SIZE - padding, y * TILE_SIZE + TILE_SIZE - padding);
+                    ctx.moveTo(x * TILE_SIZE + TILE_SIZE - padding, y * TILE_SIZE + padding);
+                    ctx.lineTo(x * TILE_SIZE + padding, y * TILE_SIZE + TILE_SIZE - padding);
+                    ctx.stroke();
                 }
             }
         }
