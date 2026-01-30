@@ -74,7 +74,7 @@ export default function HUD() {
                     </button>
 
                     <button
-                        onClick={() => gameManager.resetGame()}
+                        onClick={() => window.location.reload()}
                         className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 backdrop-blur-md border border-red-500/30 flex items-center justify-center text-red-200 transition-all active:scale-90"
                         title="Restart Game"
                     >

@@ -15,9 +15,7 @@ export class GameManager {
     private onStateChangeCallback: ((state: GameState, tick: number) => void) | null = null;
     private tickCount = 0;
 
-    private SAVE_KEY = 'ball_defense_save_v1';
-    private AUTO_SAVE_INTERVAL = 5000;
-    private autoSaveTimer: any = null;
+
 
     constructor() {
         this.state = createInitialState(MAPS[0]);
@@ -35,22 +33,12 @@ export class GameManager {
         this.input.onTileSelect = this.handleTileSelect.bind(this);
         this.input.onTileHover = this.handleTileHover.bind(this);
 
-        // Attempt Load
-        if (this.loadGame()) {
-            console.log("Game Loaded from LocalStorage");
-        }
-
         this.loop.start();
-
-        // Auto Save
-        if (this.autoSaveTimer) clearInterval(this.autoSaveTimer);
-        this.autoSaveTimer = setInterval(() => this.saveGame(), this.AUTO_SAVE_INTERVAL);
     }
 
     public cleanup() {
         this.loop.stop();
         this.input?.cleanup();
-        if (this.autoSaveTimer) clearInterval(this.autoSaveTimer);
     }
 
     public setMap(mapId: string) {
@@ -61,7 +49,6 @@ export class GameManager {
             this.state.enemies = [];
             this.state.towers = [];
             this.state.projectiles = [];
-            this.saveGame();
         }
     }
 
@@ -135,7 +122,6 @@ export class GameManager {
             };
             this.state.towers.push(newTower);
             this.state.selection.towerId = newTower.id;
-            this.saveGame();
             this.onStateChangeCallback?.(this.state, this.tickCount);
         }
     }
@@ -159,7 +145,6 @@ export class GameManager {
         if (this.state.gold >= cost) {
             this.state.gold -= cost;
             tower.tier++;
-            this.saveGame();
             this.onStateChangeCallback?.(this.state, this.tickCount);
         }
     }
@@ -180,7 +165,6 @@ export class GameManager {
         this.state.gold += refund;
         this.state.towers.splice(index, 1);
         this.state.selection = null;
-        this.saveGame();
         this.onStateChangeCallback?.(this.state, this.tickCount);
     }
 
@@ -199,46 +183,9 @@ export class GameManager {
         // Note: Logic needs to read this speed from loops
     }
 
-    // --- Persistence ---
-
-    public saveGame() {
-        try {
-            const json = JSON.stringify(this.state);
-            localStorage.setItem(this.SAVE_KEY, json);
-        } catch (e) {
-            console.warn("Save failed", e);
-        }
-    }
-
-    public loadGame(): boolean {
-        if (typeof window === 'undefined') return false;
-        const json = localStorage.getItem(this.SAVE_KEY);
-        if (!json) return false;
-
-        try {
-            const loaded = JSON.parse(json);
-            this.state.enemies.length = 0;
-            this.state.towers.length = 0;
-            this.state.projectiles.length = 0;
-            this.state.effects.length = 0;
-
-            Object.assign(this.state, loaded);
-            this.state.uiState = { previewTowerId: null, hoveredTowerId: null }; // Reset UI
-            return true;
-        } catch (e) {
-            console.warn("Load failed", e);
-            return false;
-        }
-    }
-
     public setPreview(towerId: string | null) {
         this.state.uiState.previewTowerId = towerId;
         this.onStateChangeCallback?.(this.state, this.tickCount);
-    }
-
-    public resetGame() {
-        localStorage.removeItem(this.SAVE_KEY);
-        window.location.reload();
     }
 }
 
