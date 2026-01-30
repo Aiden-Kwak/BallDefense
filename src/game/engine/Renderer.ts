@@ -1,7 +1,7 @@
 import { GameState } from '../state/GameState';
 import { TOWERS } from '../data/towers';
 
-const TILE_SIZE = 64;
+import { TILE_SIZE } from '../constants';
 
 // Modern "Dark Cyber" Palette
 const COLORS = {
