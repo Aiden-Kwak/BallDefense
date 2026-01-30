@@ -97,22 +97,44 @@ export class InputHandler {
     }
 
     private handleClick(screenX: number, screenY: number) {
-        const { state } = this;
+        // NOTE: screenX/Y from clientX/Y can be tricky with scaling.
+        // We really want offset relative to the canvas element.
+        // Since we can't easily get offsetX from here without the event, 
+        // let's rely on the fact that the canvas is full screen (w/h = window.w/h).
+        // BUT, to be absolutely safe and match Renderer exactly:
 
         const rect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
 
+        // Canvas Internal Resolution
+        const canvasW = this.canvas.width;
+        const canvasH = this.canvas.height;
+
+        // CSS Resolution
+        const cssW = rect.width;
+        const cssH = rect.height;
+
+        // Scale factors (should be 1 if page.tsx logic works, but safeguards are good)
+        const scaleX = canvasW / cssW;
+        const scaleY = canvasH / cssH;
+
+        // Position within canvas (internal pixels)
         const canvasX = (screenX - rect.left) * scaleX;
         const canvasY = (screenY - rect.top) * scaleY;
 
-        // Replicate Renderer Centering Logic
+        // --- Renderer Logic Sync ---
+        // Renderer: const paddingX = SIDEBAR_WIDTH + (playableW - boardW) / 2;
+        //           ctx.translate(paddingX, paddingY);
+
+        const { state } = this;
+        const SIDEBAR_WIDTH = 260;
         const boardW = state.map.width * TILE_SIZE;
         const boardH = state.map.height * TILE_SIZE;
 
-        // Padded offsets
-        const paddingX = (this.canvas.width - boardW) / 2;
-        const paddingY = (this.canvas.height - boardH) / 2;
+        // IMPORTANT: Use canvasW, not this.canvas.width property directly if it differs
+        const playableW = canvasW - SIDEBAR_WIDTH; // Width remaining for board
+
+        const paddingX = SIDEBAR_WIDTH + (playableW - boardW) / 2;
+        const paddingY = (canvasH - boardH) / 2;
 
         const worldX = canvasX - paddingX;
         const worldY = canvasY - paddingY;

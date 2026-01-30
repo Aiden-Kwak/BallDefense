@@ -91,8 +91,8 @@ export default function HUD() {
                         className="pointer-events-auto group relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold py-3 px-10 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-white/20 transition-all active:scale-95 animate-bounce-subtle"
                     >
                         <span className="relative z-10 flex items-center gap-2">
-                            <span className="text-lg">NEXT WAVE</span>
-                            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
+                            <span className="text-lg tracking-widest">START</span>
+                            <span className="bg-white/20 px-2 py-0.5 rounded text-sm">WAVE {state.wave}</span>
                         </span>
                         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                     </button>
