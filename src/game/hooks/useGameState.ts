@@ -35,7 +35,7 @@ export function useGameState(): GameState {
 
         return () => {
             console.log('[useGameState] Unsubscribing from game state updates');
-            gameManager.unsubscribe();
+            gameManager.unsubscribe(onTick);
         };
     }, []);
 

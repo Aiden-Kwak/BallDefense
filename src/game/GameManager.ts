@@ -12,7 +12,7 @@ export class GameManager {
     public renderer: Renderer | null = null;
     public input: InputHandler | null = null;
 
-    private onStateChangeCallback: ((state: GameState, tick: number) => void) | null = null;
+    private listeners: ((state: GameState, tick: number) => void)[] = [];
     private tickCount = 0;
 
 
@@ -53,18 +53,20 @@ export class GameManager {
     }
 
     public subscribe(callback: (state: GameState, tick: number) => void) {
-        this.onStateChangeCallback = callback;
+        if (!this.listeners.includes(callback)) {
+            this.listeners.push(callback);
+        }
     }
 
-    public unsubscribe() {
-        this.onStateChangeCallback = null;
+    public unsubscribe(callback: (state: GameState, tick: number) => void) {
+        this.listeners = this.listeners.filter(l => l !== callback);
     }
 
     private onRender() {
         this.renderer?.render(this.state);
         this.tickCount++;
-        // Call state change callback every frame to ensure UI updates
-        this.onStateChangeCallback?.(this.state, this.tickCount);
+        // Notify all listeners
+        this.listeners.forEach(listener => listener(this.state, this.tickCount));
     }
 
     private handleTileSelect(x: number, y: number) {
@@ -85,7 +87,7 @@ export class GameManager {
                 this.state.selection = null;
             }
         }
-        this.onStateChangeCallback?.(this.state, this.tickCount);
+        this.listeners.forEach(l => l(this.state, this.tickCount));
     }
 
     private handleTileHover(x: number, y: number) {
@@ -96,7 +98,7 @@ export class GameManager {
         if (this.state.uiState.hoveredTowerId !== newHoverId) {
             this.state.uiState.hoveredTowerId = newHoverId;
             // Force render update if hover changes
-            this.onStateChangeCallback?.(this.state, this.tickCount);
+            this.listeners.forEach(l => l(this.state, this.tickCount));
         }
     }
 
@@ -123,7 +125,7 @@ export class GameManager {
             };
             this.state.towers.push(newTower);
             this.state.selection.towerId = newTower.id;
-            this.onStateChangeCallback?.(this.state, this.tickCount);
+            this.listeners.forEach(l => l(this.state, this.tickCount));
         }
     }
 
@@ -146,7 +148,7 @@ export class GameManager {
         if (this.state.gold >= cost) {
             this.state.gold -= cost;
             tower.tier++;
-            this.onStateChangeCallback?.(this.state, this.tickCount);
+            this.listeners.forEach(l => l(this.state, this.tickCount));
         }
     }
 
@@ -166,7 +168,7 @@ export class GameManager {
         this.state.gold += refund;
         this.state.towers.splice(index, 1);
         this.state.selection = null;
-        this.onStateChangeCallback?.(this.state, this.tickCount);
+        this.listeners.forEach(l => l(this.state, this.tickCount));
     }
 
     public togglePause() {
@@ -176,7 +178,7 @@ export class GameManager {
         } else {
             this.loop.start();
         }
-        this.onStateChangeCallback?.(this.state, this.tickCount);
+        this.listeners.forEach(l => l(this.state, this.tickCount));
     }
 
     public toggleSpeed() {
@@ -186,7 +188,7 @@ export class GameManager {
 
     public setPreview(towerId: string | null) {
         this.state.uiState.previewTowerId = towerId;
-        this.onStateChangeCallback?.(this.state, this.tickCount);
+        this.listeners.forEach(l => l(this.state, this.tickCount));
     }
 }
 
