@@ -22,6 +22,8 @@ export interface EnemyEntity extends Entity {
     maxShield?: number;
     ccResistStacks: number;
     ccResistTimer: number;
+    reward: number;
+    speedBoostTimer?: number;
 }
 
 export interface TowerEntity extends Entity {
@@ -39,6 +41,9 @@ export interface ProjectileEntity extends Entity {
     damage: number;
     splashRadius?: number;
     slow?: boolean;
+    slowFactor?: number;
+    slowDuration?: number;
+    slowStacking?: boolean;
 }
 
 export interface GameState {
@@ -62,6 +67,7 @@ export interface GameState {
         timer: number;
         delaying: boolean;
         intermissionTimer: number; // For auto-next wave
+        currentWaveSegments: any[]; // Changed to any[] temporarily to avoid import loop or use correct type
     };
 
     // Input/Camera
@@ -111,6 +117,7 @@ export const createInitialState = (map: MapData): GameState => ({
         timer: 0,
         delaying: false,
         intermissionTimer: 0,
+        currentWaveSegments: [],
     },
     camera: { x: 0, y: 0, zoom: 1 },
     selection: null,

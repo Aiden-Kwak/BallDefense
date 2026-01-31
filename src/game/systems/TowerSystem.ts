@@ -1,6 +1,7 @@
 import { GameState, TowerEntity, EnemyEntity } from '../state/GameState';
 import { TOWERS } from '../data/towers';
 import { ProjectileEntity } from '../state/GameState';
+import { audioSystem } from './AudioSystem';
 
 export class TowerSystem {
     public update(state: GameState, dt: number) {
@@ -48,7 +49,6 @@ export class TowerSystem {
 
             if (distSq <= range * range) {
                 // Priority: Progress
-                // Note: Progress should be robust.
                 if (enemy.progress > maxProgress) {
                     maxProgress = enemy.progress;
                     bestTarget = enemy;
@@ -59,30 +59,23 @@ export class TowerSystem {
     }
 
     private fire(state: GameState, tower: TowerEntity, damage: number, targetId: string, stats: any) {
-        // Create Projectile
-        // Special: Tesla (Instant)
-        if (tower.typeId === 'TESLA') {
-            // Instant Hit Logic handled here or spawn "Instant Projectile"?
-            // Let's spawn a generic projectile with very high speed or handle direct damage?
-            // Direct damage is easier but ProjectileSystem handles effects.
-            // Let's spawn a "HitScan" projectile (speed 100) or just apply now.
-            // Applying now allows chaining logic immediately.
-            // I'll defer to ProjectileSystem using speed=20.
-        }
+        // SFX
+        audioSystem.playShoot(tower.typeId);
 
+        // Create Projectile
         const proj: ProjectileEntity = {
             id: Math.random().toString(36),
             pos: { ...tower.pos },
             active: true,
             type: this.getProjectileType(tower.typeId),
             targetId: targetId,
-            speed: 8, // Default projectile speed
+            speed: tower.typeId === 'SNIPER' ? 20 : (tower.typeId === 'STICKY' ? 12 : 8),
             damage: damage,
             splashRadius: stats.splashRadius,
             slow: !!stats.slowFactor,
-            // Pass other stats like slowFactor, freezeChance via payload if needed
-            // For MVP, we pass minimal and let ProjectileSystem re-lookup or assume standard.
-            // Ideally ProjectileEntity has `effects` object.
+            slowFactor: stats.slowFactor,
+            slowDuration: stats.slowDuration,
+            slowStacking: tower.typeId === 'STICKY',
         };
 
         state.projectiles.push(proj);

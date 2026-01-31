@@ -1,7 +1,7 @@
 export type Vector2D = { x: number; y: number };
 
 // --- Enemy Types ---
-export type EnemyType = 'GRUNT' | 'RUNNER' | 'BRUTE' | 'WARDED' | 'SWARM' | 'MINI' | 'SHIELDED';
+export type EnemyType = 'GRUNT' | 'RUNNER' | 'BRUTE' | 'WARDED' | 'SWARM' | 'MINI' | 'SHIELDED' | 'COREBREAKER' | 'DASHLING';
 
 export interface EnemyStats {
   hp: number;
@@ -17,10 +17,12 @@ export interface EnemyData {
   name: string;
   baseStats: EnemyStats;
   description: string;
+  threatCost: number;
+  onDeathSplitsInto?: { enemyId: EnemyType, count: number };
 }
 
 // --- Tower Types ---
-export type TowerType = 'ARROW' | 'CANNON' | 'FROST' | 'ARCANE' | 'POISON' | 'TESLA';
+export type TowerType = 'ARROW' | 'CANNON' | 'FROST' | 'ARCANE' | 'POISON' | 'TESLA' | 'SNIPER' | 'STICKY';
 export type DamageType = 'PHYSICAL' | 'MAGIC';
 
 export interface TowerStats {

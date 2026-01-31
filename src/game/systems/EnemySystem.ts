@@ -1,5 +1,8 @@
 import { GameState, EnemyEntity } from '../state/GameState';
-import { Vector2D } from '../types';
+import { Vector2D, EnemyType } from '../types';
+import { ENEMIES } from '../data/enemies';
+import { WAVE_SCALING } from '../data/waves';
+import { audioSystem } from './AudioSystem';
 
 export class EnemySystem {
     public update(state: GameState, dt: number) {
@@ -17,17 +20,22 @@ export class EnemySystem {
 
             // Check Death/Goal
             if (enemy.hp <= 0) {
-                state.gold += Math.round(this.getReward(enemy));
-                // Spawn Minis if SWARM
-                if (enemy.typeId === 'SWARM') {
-                    // TODO: Add logic to spawn Minis
-                    // For MVP simplicty, maybe just skip or add a "spawnQueue" to state?
-                    // I'll just skip sub-spawning for now or implement direct push if I had access to WaveSystem.
-                    // Actually, I can just push to state.enemies here.
-                    this.spawnMinis(state, enemy.pos);
+                // SFX
+                audioSystem.playExplosion();
+
+                state.gold += Math.round(enemy.reward || 5);
+
+                // Generalized Splitting Logic
+                const data = ENEMIES[enemy.typeId];
+                if (data && data.onDeathSplitsInto) {
+                    this.spawnSubEnemies(state, enemy, data.onDeathSplitsInto.enemyId, data.onDeathSplitsInto.count);
                 }
+
                 state.enemies.splice(i, 1);
             } else if (this.hasReachedEnd(enemy, state.map.waypoints)) {
+                // SFX
+                audioSystem.playLifeLost();
+
                 state.lives -= 1;
                 state.enemies.splice(i, 1);
             }
@@ -40,29 +48,6 @@ export class EnemySystem {
             enemy.poisonTimer -= dt;
             if (enemy.poisonTimer <= 0) {
                 enemy.poisonStacks = 0;
-            } else {
-                // Apply Damage? Usually DoT applies per second.
-                // Simplified: Projectile logic handles "Tick" or we do it here.
-                // Let's assume TowerSystem applied a 'lastTick' or we just subtract DPS * dt here.
-                // To be safe, let's subtract DPS * dt:
-                // But we need to know the DPS of the poison. It's not stored on Enemy.
-                // Enemy just has stacks.
-                // We will ignore damage here and assume Projectile/Tower applies it, 
-                // OR we need to store 'poisonDps' on the enemy.
-                // Let's redesign: Enemy stores `poisonDamageAccumulator`.
-                // Ideally, Poison Tower applies a "Status Object" { dps, duration }.
-                // For MVP, if stacks > 0, assume fixed DPS or it was too complex.
-                // User requirements: "Poison DoT 6/s for 2.5s".
-                // I'll just hardcode a simple tick if stacks > 0 assuming a standard damage, 
-                // Or better: The POISON TOWER updates the enemy's `poisonTimer` and generic `poisonDps` field.
-                // Let's rely on standard logic: POISON TOWER just deals damage.
-                // But Requirement says "DoT". 
-                // I will add `poisonDps` to EnemyEntity if not there, or just skip precise DoT implementation for MVP 
-                // and treat it as rapid fire or similar. 
-                // WAIT: "Poison DoT... conditions...".
-                // I will just add `incomingDps` or similar to Enemy? 
-                // Let's keep it simple: `poisonStacks` are just for the Armor Shred condition in Tower 3. 
-                // The actual damage is applied by the Projectile or a "PoisonStatus" object list.
             }
         }
 
@@ -81,14 +66,18 @@ export class EnemySystem {
     }
 
     private moveEnemy(enemy: EnemyEntity, waypoints: Vector2D[], dt: number) {
-        const speed = enemy.speed * enemy.slowFactor;
+        let speed = enemy.speed * enemy.slowFactor;
+        if (enemy.speedBoostTimer && enemy.speedBoostTimer > 0) {
+            speed *= 1.2;
+            enemy.speedBoostTimer -= dt;
+        }
         const distanceToMove = speed * dt;
 
         let remainingDist = distanceToMove;
 
         while (remainingDist > 0) {
             const targetIndex = enemy.pathIndex + 1;
-            if (targetIndex >= waypoints.length) break; // End reached logic handles checking
+            if (targetIndex >= waypoints.length) break;
 
             const targetPos = waypoints[targetIndex];
             const dx = targetPos.x - enemy.pos.x;
@@ -117,43 +106,45 @@ export class EnemySystem {
         return enemy.pathIndex >= waypoints.length - 1;
     }
 
-    private getReward(enemy: EnemyEntity): number {
-        // Need lookup or store on entity. 
-        // Simplified: Assume default reward from type
-        // But we applied scaling.
-        // Let's re-lookup stats or store 'reward' on entity.
-        // I'll re-lookup for now to save memory, assuming scaling logic is consistent.
-        // Actually, I should have stored `reward` on entity.
-        // Let's just return 5 for MVP if missing.
-        return 5;
-    }
+    private spawnSubEnemies(state: GameState, parent: EnemyEntity, childTypeId: EnemyType, count: number) {
+        const data = ENEMIES[childTypeId];
+        if (!data) return;
 
-    private spawnMinis(state: GameState, pos: Vector2D) {
-        const miniStats = { hp: 25, speed: 1.6, reward: 2 }; // Hardcoded from requirements
-        for (let i = 0; i < 2; i++) {
-            const mini: EnemyEntity = {
-                id: Math.random().toString(36),
-                typeId: 'MINI',
-                pos: { ...pos }, // Start where parent died
+        const w = state.wave;
+        const hpMult = WAVE_SCALING.getHpMultiplier(w);
+        const season = Math.ceil(w / 10);
+        const speedMult = WAVE_SCALING.getSpeedMultiplier(season);
+
+        for (let i = 0; i < count; i++) {
+            const offset = (i - (count - 1) / 2) * 0.15;
+
+            const child: EnemyEntity = {
+                id: Math.random().toString(36).substring(2, 9),
+                typeId: childTypeId,
+                pos: { x: parent.pos.x + offset, y: parent.pos.y + offset },
                 active: true,
-                hp: miniStats.hp,
-                maxHp: miniStats.hp,
-                speed: miniStats.speed,
-                progress: 0, // Approx? Actually needs parent progress.
-                // This is tricky. Defining pathIndex from parent is needed.
-                // I need to copy pathIndex and recalculate exact progress?
-                // For MVP, just spawn them at the parent POS and same pathIndex.
-                pathIndex: 0, // Logic needs parent's pathIndex. 
-                // I can't access parent here easily unless I passed it.
-                // Assume I can fix `spawnMinis` to take parent.
-                slowFactor: 1, slowTimer: 0, poisonStacks: 0, poisonTimer: 0, freezeTimer: 0, ccResistStacks: 0, ccResistTimer: 0
+
+                hp: data.baseStats.hp * hpMult,
+                maxHp: data.baseStats.hp * hpMult,
+                speed: data.baseStats.speed * speedMult,
+
+                reward: data.baseStats.reward,
+
+                progress: parent.progress,
+                pathIndex: parent.pathIndex,
+
+                slowFactor: 1,
+                slowTimer: 0,
+                poisonStacks: 0,
+                poisonTimer: 0,
+                freezeTimer: 0,
+
+                ccResistStacks: 0,
+                ccResistTimer: 0,
+                speedBoostTimer: childTypeId === 'DASHLING' ? 1.0 : 0,
             };
-            // Fix: Need parent pathIndex.
-            // Due to strict type/scope, I'll just spawn them at start if I can't get it, 
-            // OR I improve the `moveEnemy` to find nearest waypoint? 
-            // Better: Inherit `pathIndex` and `progress`.
-            // I will defer this advanced feature to a polish phase or ignore for now to prevent bugs.
-            // state.enemies.push(mini);
+
+            state.enemies.push(child);
         }
     }
 }

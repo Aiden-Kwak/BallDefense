@@ -169,43 +169,166 @@ export class Renderer {
         for (const enemy of state.enemies) {
             const cx = enemy.pos.x * TILE_SIZE + TILE_SIZE / 2;
             const cy = enemy.pos.y * TILE_SIZE + TILE_SIZE / 2;
+            const size = this.getEnemySize(enemy.typeId);
+            const color = this.getEnemyColor(enemy.typeId);
 
             // Shadow
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
             ctx.beginPath();
-            ctx.ellipse(cx, cy + 12, 12, 6, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx, cy + size * 0.8, size * 0.9, size * 0.4, 0, 0, Math.PI * 2);
             ctx.fill();
 
+            // Special Effects (Background layer)
+            this.drawEnemyAuras(ctx, cx, cy, enemy);
+
             // Body
-            const color = this.getEnemyColor(enemy.typeId);
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            // Rotation for some types
+            if (enemy.typeId === 'RUNNER' || enemy.typeId === 'DASHLING') {
+                // Approximate rotation based on movement direction could be added here
+                // For now, let's keep them oriented consistently
+            }
+
             ctx.shadowColor = color;
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = enemy.typeId === 'COREBREAKER' ? 15 : 8;
             ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+
+            this.drawEnemyShape(ctx, enemy.typeId, size);
+
             ctx.fill();
-            ctx.shadowBlur = 0;
+            if (enemy.typeId === 'BRUTE' || enemy.typeId === 'COREBREAKER') {
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // Overlay Effects (Shields, etc.)
+            this.drawEnemyOverlays(ctx, cx, cy, enemy, size);
 
             // HP Bar
             const hpPct = enemy.hp / enemy.maxHp;
-            const barW = 30;
-            const barY = cy - 24;
-            ctx.fillStyle = '#0f172a';
+            const barW = size * 2.2;
+            const barY = cy - size - 8;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
             ctx.fillRect(cx - barW / 2, barY, barW, 4);
             ctx.fillStyle = hpPct > 0.5 ? '#22c55e' : '#ef4444';
             ctx.fillRect(cx - barW / 2, barY, barW * hpPct, 4);
         }
     }
 
+    private drawEnemyShape(ctx: CanvasRenderingContext2D, typeId: string, size: number) {
+        ctx.beginPath();
+        switch (typeId) {
+            case 'RUNNER': // Forward-facing Triangle
+                ctx.moveTo(size * 1.2, 0);
+                ctx.lineTo(-size * 0.8, -size * 0.8);
+                ctx.lineTo(-size * 0.8, size * 0.8);
+                ctx.closePath();
+                break;
+            case 'BRUTE': // Heavy Square
+                ctx.rect(-size, -size, size * 2, size * 2);
+                break;
+            case 'WARDED': // Octagon
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i * Math.PI) / 4;
+                    const x = size * Math.cos(angle);
+                    const y = size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                break;
+            case 'SWARM': // Pentagon
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+                    const x = size * Math.cos(angle);
+                    const y = size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                break;
+            case 'COREBREAKER': // Large Hexagon with core
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * Math.PI) / 3;
+                    const x = size * Math.cos(angle);
+                    const y = size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                break;
+            case 'DASHLING': // Narrow Diamond
+                ctx.moveTo(size * 1.4, 0);
+                ctx.lineTo(0, -size * 0.6);
+                ctx.lineTo(-size * 0.8, 0);
+                ctx.lineTo(0, size * 0.6);
+                ctx.closePath();
+                break;
+            default: // Circle for GRUNT and MINI
+                ctx.arc(0, 0, size, 0, Math.PI * 2);
+        }
+    }
+
+    private drawEnemyAuras(ctx: CanvasRenderingContext2D, cx: number, cy: number, enemy: any) {
+        if (enemy.typeId === 'WARDED') {
+            const time = Date.now() / 1000;
+            const pulse = 0.8 + Math.sin(time * 5) * 0.2;
+            ctx.fillStyle = `rgba(168, 85, 247, ${0.2 * pulse})`;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 25 * pulse, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    private drawEnemyOverlays(ctx: CanvasRenderingContext2D, cx: number, cy: number, enemy: any, size: number) {
+        // Shield Ring
+        if (enemy.shield && enemy.shield > 0) {
+            ctx.strokeStyle = '#22d3ee';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.arc(cx, cy, size + 5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        // Slow Effect
+        if (enemy.slowFactor < 1) {
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.4)';
+            ctx.beginPath();
+            ctx.arc(cx, cy, size + 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    private getEnemySize(typeId: string): number {
+        switch (typeId) {
+            case 'GRUNT': return 12;
+            case 'RUNNER': return 11;
+            case 'BRUTE': return 17;
+            case 'WARDED': return 14;
+            case 'SWARM': return 13;
+            case 'MINI': return 7;
+            case 'SHIELDED': return 14;
+            case 'COREBREAKER': return 20;
+            case 'DASHLING': return 9;
+            default: return 12;
+        }
+    }
+
     private getEnemyColor(typeId: string): string {
         switch (typeId) {
-            case 'GRUNT': return '#60a5fa';
-            case 'RUNNER': return '#f87171';
-            case 'BRUTE': return '#34d399';
-            case 'SWARM': return '#fcd34d';
-            case 'WARDED': return '#c084fc';
-            case 'SHIELDED': return '#f472b6';
-            default: return '#fff';
+            case 'GRUNT': return '#94a3b8'; // Slate
+            case 'RUNNER': return '#fbbf24'; // Amber
+            case 'BRUTE': return '#10b981'; // Emerald
+            case 'WARDED': return '#a855f7'; // Purple
+            case 'SWARM': return '#f97316'; // Orange
+            case 'MINI': return '#fdba74'; // Light Orange
+            case 'SHIELDED': return '#ec4899'; // Pink
+            case 'COREBREAKER': return '#ef4444'; // Red
+            case 'DASHLING': return '#22d3ee'; // Cyan
+            default: return '#ffffff';
         }
     }
 

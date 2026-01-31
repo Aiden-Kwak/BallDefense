@@ -4,6 +4,9 @@ import "../src/app/globals.css";
 export const metadata: Metadata = {
     title: "Ball Defense",
     description: "Serverless Tower Defense Game",
+    icons: {
+        icon: "/favicon.svg",
+    },
 };
 
 export default function RootLayout({

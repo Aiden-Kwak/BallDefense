@@ -40,8 +40,8 @@ export default function HUD() {
                     <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3 min-w-[120px]">
                         <WaveIcon />
                         <div className="flex flex-col leading-none">
-                            <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">Defense</span>
-                            <span className="text-xl font-black text-white">WAVE {state.wave}</span>
+                            <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">Defense Season {Math.ceil(state.wave / 10)}</span>
+                            <span className="text-xl font-black text-white">WAVE {state.wave % 10 || 10}</span>
                         </div>
                     </div>
                 </div>
@@ -49,6 +49,27 @@ export default function HUD() {
                 {/* Right: Gold, Lives & Controls */}
                 <div className="flex flex-col gap-3 pointer-events-auto items-end">
                     <div className="flex items-center gap-3">
+                        {/* WAVE STATUS / BUTTON */}
+                        {state.waveActive ? (
+                            <div className="bg-cyan-500/20 border border-cyan-400/30 py-2 px-6 rounded-2xl flex items-center justify-center shadow-xl animate-pulse">
+                                <span className="text-sm font-black text-cyan-400 tracking-widest uppercase">
+                                    WAVE {state.wave}
+                                </span>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={handleNextWave}
+                                className={`group relative overflow-hidden py-2 px-6 rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-xl border border-white/10
+                                ${state.wave === 1
+                                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400'
+                                        : 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400'}`}
+                            >
+                                <span className="text-sm font-black text-white tracking-widest uppercase truncate max-w-[100px]">
+                                    {state.wave === 1 ? 'START' : `WAVE ${state.wave}`}
+                                </span>
+                            </button>
+                        )}
+
                         {/* Gold */}
                         <div className="bg-black/40 backdrop-blur-md border border-white/10 px-5 py-2 rounded-2xl shadow-xl flex items-center gap-3">
                             <div className="flex flex-col items-end leading-none">
@@ -85,52 +106,8 @@ export default function HUD() {
                 </div>
             </div>
 
-            {/* Center Status / Start Button */}
-            <div className="absolute top-24 left-1/2 -translate-x-1/2 w-full px-8 pointer-events-none z-20 flex justify-center flex-col items-center gap-4">
+            {/* Center Status / Start Button Area Removed */}
 
-                {/* AUTO START COUNTDOWN (Removed as per request for immediate transition) */}
-                {/* 
-                {state.waveState.intermissionTimer > 0 && !state.waveActive && (
-                    <div className="bg-black/60 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/20 animate-pulse text-center">
-                        <div className="text-cyan-400 font-bold text-sm tracking-widest uppercase mb-1">Next Wave In</div>
-                        <div className="text-4xl font-black text-white">{Math.ceil(state.waveState.intermissionTimer)}</div>
-                    </div>
-                )}
-                */}
-
-                {/* START BUTTON (Only for Wave 1) */}
-                {!state.waveActive && state.wave === 1 && state.waveState.intermissionTimer <= 0 && (
-                    <button
-                        onClick={handleNextWave}
-                        className="pointer-events-auto group relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold py-3 px-10 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-white/20 transition-all active:scale-95 animate-bounce-subtle"
-                    >
-                        <span className="relative z-10 flex items-center gap-2">
-                            <span className="text-lg tracking-widest">START</span>
-                        </span>
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                    </button>
-                )}
-
-                {/* NEXT WAVE BUTTON (For Wave > 1) */}
-                {!state.waveActive && state.wave > 1 && state.waveState.intermissionTimer <= 0 && (
-                    <button
-                        onClick={handleNextWave}
-                        className="pointer-events-auto group relative overflow-hidden bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold py-3 px-10 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] border border-white/20 transition-all active:scale-95"
-                    >
-                        <span className="relative z-10 flex items-center gap-2">
-                            <span className="text-lg tracking-widest">WAVE {state.wave}</span>
-                        </span>
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                    </button>
-                )}
-
-                {/* WAVE STATUS (During Wave) */}
-                {state.waveActive && (
-                    <div className="bg-black/40 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
-                        <span className="text-xl font-black text-white tracking-widest uppercase">Wave {state.wave} Active</span>
-                    </div>
-                )}
-            </div>
 
             {/* Game Over Overlay */}
             {state.lives <= 0 && (

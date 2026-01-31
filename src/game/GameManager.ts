@@ -5,6 +5,7 @@ import { Renderer } from './engine/Renderer';
 import { MAPS } from './data/maps';
 import { TowerEntity } from './state/GameState';
 import { TOWERS } from './data/towers';
+import { audioSystem } from './systems/AudioSystem';
 
 export class GameManager {
     public state: GameState;
@@ -14,8 +15,7 @@ export class GameManager {
 
     private listeners: ((state: GameState, tick: number) => void)[] = [];
     private tickCount = 0;
-
-
+    private audioInitialized = false;
 
     constructor() {
         this.state = createInitialState(MAPS[0]);
@@ -34,6 +34,16 @@ export class GameManager {
         this.input.onTileHover = this.handleTileHover.bind(this);
 
         this.loop.start();
+    }
+
+    private ensureAudio() {
+        if (!this.audioInitialized) {
+            audioSystem.resume();
+            audioSystem.startMusic();
+            this.audioInitialized = true;
+        } else {
+            audioSystem.resume();
+        }
     }
 
     public cleanup() {
@@ -70,6 +80,8 @@ export class GameManager {
     }
 
     private handleTileSelect(x: number, y: number) {
+        this.ensureAudio();
+
         if (x < 0 || x >= this.state.map.width || y < 0 || y >= this.state.map.height) {
             this.state.selection = null;
             return;
@@ -103,6 +115,7 @@ export class GameManager {
     }
 
     public buildTower(towerId: string) {
+        this.ensureAudio();
         if (!this.state.selection || !this.state.selection.tile) return;
         if (this.state.selection.towerId) return;
 
@@ -115,6 +128,9 @@ export class GameManager {
             const oldGold = this.state.gold;
             this.state.gold -= cost;
             console.log('[GameManager] buildTower - Gold changed:', oldGold, '->', this.state.gold);
+
+            audioSystem.playBuild();
+
             const newTower: TowerEntity = {
                 id: Math.random().toString(36),
                 typeId: towerId,

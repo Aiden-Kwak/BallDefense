@@ -128,18 +128,54 @@ export const TOWERS: Record<string, TowerData> = {
             },
             {
                 tier: 3,
-                stats: { cost: 140, range: 2.5, fireRate: 0.75, damage: 18, type: 'MAGIC', chainCount: 4, chainReduction: 0.7 }, // Note: 4th is 45% naturally by math (0.7^3 = 0.34) but user specified manual curve? User said "2nd 70, 3rd 55, 4th 45". 
-                // My reduction model is simple multiplication. User wants specific decay.
-                // I will need to handle custom decay logic in the system if I want exact per-jump percentages.
-                // For now, I'll store the raw chain count and handle detail in logic or just use a simpler model.
-                // Let's assume the System handles the specific multipliers if needed, or I can add a `chainMultipliers` array to stat if strict.
-                // Let's stick to simple reduction for now as defined in type, but maybe I should add `customChainMultipliers`.
-                // Actually, let's keep it simple for data: chainCount and a base reduction. 
-                // User asked: "2nd 70%, 3rd 55%, 4th 45%". 0.7, 0.55, 0.45.
-                // If I use 0.8 reduction: 0.8, 0.64, 0.51.
-                // I'll stick to a generic "reduction" for now, or just hardcode the logic in TeslaSystem for the specific curve.
+                stats: { cost: 140, range: 2.5, fireRate: 0.75, damage: 18, type: 'MAGIC', chainCount: 4, chainReduction: 0.7 },
                 description: 'Chains to 4 targets. Bonus vs Shields.'
             },
         ],
     },
+    SNIPER: {
+        id: 'SNIPER',
+        name: 'Sniper Tower',
+        unlockWave: 4,
+        tiers: [
+            {
+                tier: 1,
+                stats: { cost: 70, range: 6.0, fireRate: 0.3, damage: 55, type: 'PHYSICAL' },
+                description: 'Extreme range single target damage.'
+            },
+            {
+                tier: 2,
+                stats: { cost: 95, range: 6.5, fireRate: 0.3, damage: 85, type: 'PHYSICAL' },
+                description: 'Increased range and damage.'
+            },
+            {
+                tier: 3,
+                stats: { cost: 130, range: 7.0, fireRate: 0.3, damage: 125, type: 'PHYSICAL', critChance: 0.25 },
+                description: 'Deadly precision with high crit chance.'
+            },
+        ],
+    },
+    STICKY: {
+        id: 'STICKY',
+        name: 'Sticky Tower',
+        unlockWave: 6,
+        tiers: [
+            {
+                tier: 1,
+                stats: { cost: 55, range: 2.6, fireRate: 1.2, damage: 4, type: 'MAGIC', slowFactor: 0.12, slowDuration: 1.5 },
+                description: 'Applies weak stackable slow.'
+            },
+            {
+                tier: 2,
+                stats: { cost: 80, range: 2.6, fireRate: 1.4, damage: 6, type: 'MAGIC', slowFactor: 0.15, slowDuration: 1.8 },
+                description: 'Faster firing and stronger slow.'
+            },
+            {
+                tier: 3,
+                stats: { cost: 110, range: 2.6, fireRate: 1.6, damage: 8, type: 'MAGIC', slowFactor: 0.18, slowDuration: 2.0 },
+                description: 'High stack potential with rapid fire.'
+            },
+        ],
+    },
 };
+
