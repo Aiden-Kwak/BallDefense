@@ -40,20 +40,26 @@ export default function HUD() {
                 {/* Single Right Column for HUD */}
                 <div className="flex flex-col gap-3 pointer-events-auto items-end">
 
-                    {/* Top Row: Wave & Money/Lives */}
+                    {/* Top Row: Wave Info/Button & Money/Lives */}
                     <div className="flex items-center gap-3">
-                        {/* Wave Info */}
-                        <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3 min-w-[120px]">
+                        {/* Wave Info + Start Button */}
+                        <button
+                            onClick={!state.waveActive ? handleNextWave : undefined}
+                            className={`px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3 min-w-[120px] border transition-all active:scale-95 text-left
+                            ${!state.waveActive
+                                    ? 'bg-gradient-to-r from-emerald-600 to-teal-500 border-white/20 hover:from-emerald-500 hover:to-teal-400 animate-pulse'
+                                    : 'bg-black/40 backdrop-blur-md border-white/10 opacity-90'}`}
+                        >
                             <WaveIcon />
                             <div className="flex flex-col leading-none">
-                                <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">
+                                <span className={`text-[10px] font-bold uppercase tracking-wider opacity-70 ${!state.waveActive ? 'text-white' : 'text-cyan-200'}`}>
                                     {t('ui.season', lang)} {Math.ceil(state.wave / 10)}
                                 </span>
-                                <span className="text-xl font-black text-white">
+                                <span className={`text-xl font-black ${!state.waveActive ? 'text-white' : 'text-white'}`}>
                                     {t('ui.wave', lang)} {state.wave % 10 || 10}
                                 </span>
                             </div>
-                        </div>
+                        </button>
 
                         {/* Gold */}
                         <div className="bg-black/40 backdrop-blur-md border border-white/10 px-5 py-2 rounded-2xl shadow-xl flex items-center gap-3">
@@ -90,29 +96,8 @@ export default function HUD() {
                             ))}
                         </div>
 
-                        {/* Speed/Wave/Pause Controls */}
+                        {/* Speed/Pause/Restart Controls */}
                         <div className="flex gap-2 items-center">
-                            {/* Wave Status/Button */}
-                            {state.waveActive ? (
-                                <div className="bg-cyan-500/20 border border-cyan-400/30 py-2 px-6 rounded-2xl flex items-center justify-center shadow-xl animate-pulse min-w-[100px]">
-                                    <span className="text-sm font-black text-cyan-400 tracking-widest uppercase">
-                                        {t('ui.wave', lang)} {state.wave}
-                                    </span>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={handleNextWave}
-                                    className={`group relative overflow-hidden py-2 px-6 rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-xl border border-white/10 min-w-[100px]
-                                    ${state.wave === 1
-                                            ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400'
-                                            : 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400'}`}
-                                >
-                                    <span className="text-sm font-black text-white tracking-widest uppercase truncate">
-                                        {state.wave === 1 ? t('ui.start', lang) : `${t('ui.wave', lang)} ${state.wave}`}
-                                    </span>
-                                </button>
-                            )}
-
                             <button
                                 onClick={() => gameManager.toggleSpeed()}
                                 className={`w-10 h-10 rounded-xl backdrop-blur-md border flex items-center justify-center font-black text-xs transition-all active:scale-90
