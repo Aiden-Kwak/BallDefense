@@ -1,28 +1,34 @@
-import { useEffect, useState } from 'react';
-import { gameManager, GameManager } from '../GameManager';
+import { useEffect, useReducer } from 'react';
+import { gameManager } from '../GameManager';
 import { GameState } from '../state/GameState';
 
+// Use reducer to force re-renders
+function stateReducer(state: GameState, newState: GameState): GameState {
+    // Always return a new object to trigger React re-render
+    return { ...newState };
+}
+
 export function useGameState(): GameState {
-    const [state, setState] = useState<GameState>(gameManager.state);
-    const [updateCount, setUpdateCount] = useState(0);
+    const [state, dispatch] = useReducer(stateReducer, gameManager.state);
 
     useEffect(() => {
         const onTick = (newState: GameState, tick: number) => {
-            // Force React to re-render by incrementing counter
-            // This ensures UI updates immediately when gold/lives change
-            setUpdateCount(prev => prev + 1);
-            setState(newState);
+            // Log to verify callback is being called
+            if (tick % 60 === 0) {
+                console.log('[useGameState] Gold:', newState.gold, 'Lives:', newState.lives, 'Tick:', tick);
+            }
+            // Dispatch new state to force re-render
+            dispatch(newState);
         };
 
+        console.log('[useGameState] Subscribing to game state updates');
         gameManager.subscribe(onTick);
-        return () => gameManager.unsubscribe();
+
+        return () => {
+            console.log('[useGameState] Unsubscribing from game state updates');
+            gameManager.unsubscribe();
+        };
     }, []);
 
-    // Return a new object reference each time to ensure React detects changes
-    return {
-        ...state,
-        // Explicitly include gold and lives to ensure they trigger re-renders
-        gold: state.gold,
-        lives: state.lives,
-    };
+    return state;
 }

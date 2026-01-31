@@ -110,7 +110,9 @@ export class GameManager {
 
         const cost = Number(data.tiers[0].stats.cost);
         if (this.state.gold >= cost) {
+            const oldGold = this.state.gold;
             this.state.gold -= cost;
+            console.log('[GameManager] buildTower - Gold changed:', oldGold, '->', this.state.gold);
             const newTower: TowerEntity = {
                 id: Math.random().toString(36),
                 typeId: towerId,
