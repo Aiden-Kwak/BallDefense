@@ -36,6 +36,12 @@ export default function TowerControls() {
             const handleUpgrade = () => gameManager.upgradeTower();
             const handleSell = () => gameManager.sellTower();
 
+            const sellCost = Math.floor((
+                data.tiers[0].stats.cost +
+                (tower.tier >= 2 ? data.tiers[1].stats.cost : 0) +
+                (tower.tier >= 3 ? data.tiers[2].stats.cost : 0)
+            ) * 0.3);
+
             return (
                 <div className="flex flex-col h-full animate-fade-in">
                     <div className="mb-6">
@@ -96,7 +102,7 @@ export default function TowerControls() {
                             className="w-full py-3 px-4 rounded-xl font-bold bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 transition-colors flex items-center justify-between"
                         >
                             <span>SELL</span>
-                            <span className="opacity-70">+{Math.floor(currentTier.stats.cost * 0.7)}G</span>
+                            <span className="opacity-70">-{sellCost}G</span>
                         </button>
                     </div>
                 </div>
