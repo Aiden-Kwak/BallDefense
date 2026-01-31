@@ -4,8 +4,17 @@ import { GameState } from '../state/GameState';
 
 // Use reducer to force re-renders
 function stateReducer(state: GameState, newState: GameState): GameState {
-    // Always return a new object to trigger React re-render
-    return { ...newState };
+    // Create a completely new object with new primitive values
+    // This ensures React detects changes to gold and lives
+    return {
+        ...newState,
+        gold: Number(newState.gold), // Force new primitive value
+        lives: Number(newState.lives), // Force new primitive value
+        wave: Number(newState.wave),
+        enemies: [...newState.enemies],
+        towers: [...newState.towers],
+        projectiles: [...newState.projectiles],
+    };
 }
 
 export function useGameState(): GameState {
