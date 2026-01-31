@@ -105,6 +105,19 @@ export default function HUD() {
                         className="pointer-events-auto group relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold py-3 px-10 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-white/20 transition-all active:scale-95 animate-bounce-subtle"
                     >
                         <span className="relative z-10 flex items-center gap-2">
+                            <span className="text-lg tracking-widest">START</span>
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    </button>
+                )}
+
+                {/* NEXT WAVE BUTTON (For Wave > 1) */}
+                {!state.waveActive && state.wave > 1 && state.waveState.intermissionTimer <= 0 && (
+                    <button
+                        onClick={handleNextWave}
+                        className="pointer-events-auto group relative overflow-hidden bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold py-3 px-10 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] border border-white/20 transition-all active:scale-95"
+                    >
+                        <span className="relative z-10 flex items-center gap-2">
                             <span className="text-lg tracking-widest">WAVE {state.wave}</span>
                         </span>
                         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
@@ -114,13 +127,29 @@ export default function HUD() {
                 {/* WAVE STATUS (During Wave) */}
                 {state.waveActive && (
                     <div className="bg-black/40 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
-                        <span className="text-xl font-black text-white tracking-widest">WAVE {state.wave}</span>
+                        <span className="text-xl font-black text-white tracking-widest uppercase">Wave {state.wave} Active</span>
                     </div>
                 )}
             </div>
 
+            {/* Game Over Overlay */}
+            {state.lives <= 0 && (
+                <div className="absolute inset-0 z-[100] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-8 animate-fade-in pointer-events-auto">
+                    <div className="text-rose-500 text-7xl font-black tracking-tighter mb-4 drop-shadow-[0_0_30px_rgba(244,63,94,0.5)]">GAME OVER</div>
+                    <p className="text-slate-400 text-xl font-medium mb-12">Defense breached. Better luck next time.</p>
+
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="bg-white text-black font-black py-4 px-12 rounded-2xl hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-3 text-xl shadow-xl"
+                    >
+                        <span>TRY AGAIN</span>
+                        <span className="text-2xl">↻</span>
+                    </button>
+                </div>
+            )}
+
             {/* Pause Overlay */}
-            {state.paused && (
+            {state.paused && state.lives > 0 && (
                 <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center pointer-events-none">
                     <div className="text-4xl font-black text-white tracking-widest uppercase drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">PAUSED</div>
                 </div>

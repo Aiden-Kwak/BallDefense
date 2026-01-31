@@ -163,9 +163,9 @@ export class GameManager {
         if (tower.tier >= 2) totalSpent += data.tiers[1].stats.cost;
         if (tower.tier >= 3) totalSpent += data.tiers[2].stats.cost;
 
-        const refund = Math.floor(totalSpent * 0.7);
+        const cost = Math.floor(totalSpent * 0.3); // 30% of total investment as demolition cost
 
-        this.state.gold += refund;
+        this.state.gold -= cost;
         this.state.towers.splice(index, 1);
         this.state.selection = null;
         this.listeners.forEach(l => l(this.state, this.tickCount));
