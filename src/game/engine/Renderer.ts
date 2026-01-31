@@ -1,4 +1,5 @@
 import { GameState } from '../state/GameState';
+import { t } from '../data/translations';
 import { TOWERS } from '../data/towers';
 
 import { TILE_SIZE } from '../constants';
@@ -258,6 +259,30 @@ export class Renderer {
                 }
                 ctx.closePath();
                 break;
+            case 'NEST': // Huge Hexagon with internal pods
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * Math.PI) / 3;
+                    const x = size * Math.cos(angle);
+                    const y = size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                // Draw internal "pods"
+                for (let i = 0; i < 3; i++) {
+                    const angle = (i * 2 * Math.PI) / 3;
+                    const px = (size * 0.4) * Math.cos(angle);
+                    const py = (size * 0.4) * Math.sin(angle);
+                    ctx.moveTo(px + 4, py);
+                    ctx.arc(px, py, 4, 0, Math.PI * 2);
+                }
+                break;
+            case 'TANKER': // Heavy Diamond
+                ctx.moveTo(size * 1.2, 0);
+                ctx.lineTo(0, -size * 1.2);
+                ctx.lineTo(-size * 1.2, 0);
+                ctx.lineTo(0, size * 1.2);
+                ctx.closePath();
+                break;
             case 'DASHLING': // Narrow Diamond
                 ctx.moveTo(size * 1.4, 0);
                 ctx.lineTo(0, -size * 0.6);
@@ -313,6 +338,8 @@ export class Renderer {
             case 'SHIELDED': return 14;
             case 'COREBREAKER': return 20;
             case 'DASHLING': return 9;
+            case 'NEST': return 26;
+            case 'TANKER': return 18;
             default: return 12;
         }
     }
@@ -328,6 +355,8 @@ export class Renderer {
             case 'SHIELDED': return '#ec4899'; // Pink
             case 'COREBREAKER': return '#ef4444'; // Red
             case 'DASHLING': return '#22d3ee'; // Cyan
+            case 'NEST': return '#8b5cf6'; // Violet
+            case 'TANKER': return '#4ade80'; // Bright Green
             default: return '#ffffff';
         }
     }

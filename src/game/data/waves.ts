@@ -1,17 +1,17 @@
 import { EnemyType } from '../types';
 
 export const WAVE_SCALING = {
-    // HP_MULT = 1 + 0.12 * w + 0.015 * (w ^ 1.25)
-    getHpMultiplier: (w: number) => 1 + 0.12 * w + 0.015 * Math.pow(w, 1.25),
+    // HP_MULT: Slightly more aggressive growth for late game
+    getHpMultiplier: (w: number) => 1 + 0.14 * w + 0.02 * Math.pow(w, 1.3),
 
-    // RESIST_BONUS = min(season * 2, 20)
-    getResistBonus: (season: number) => Math.min(season * 2, 20),
+    // RESIST_BONUS = min(season * 2, 25)
+    getResistBonus: (season: number) => Math.min(season * 2.5, 25),
 
-    // SPEED_MULT = (1 + 0.015 * (season - 1)) * (1.1 ^ floor(w / 5))
+    // SPEED_MULT: Increased from 1.1^step to 1.12^step
     getSpeedMultiplier: (w: number) => {
         const season = Math.ceil(w / 10);
-        const seasonalBase = Math.min(1 + 0.015 * (season - 1), 1.2);
-        const waveStep = Math.pow(1.1, Math.floor(w / 5));
+        const seasonalBase = Math.min(1 + 0.02 * (season - 1), 1.3);
+        const waveStep = Math.pow(1.12, Math.floor(w / 4)); // Faster frequency and higher mult
         return seasonalBase * waveStep;
     },
 
@@ -32,7 +32,7 @@ export const SLOT_POOLS: Record<number, EnemyPoolWeight[]> = {
     5: [{ enemyId: 'SHIELDED', weight: 70 }, { enemyId: 'WARDED', weight: 30 }], // Shield pressure
     6: [{ enemyId: 'WARDED', weight: 70 }, { enemyId: 'BRUTE', weight: 30 }], // Resistance pressure
     7: [{ enemyId: 'GRUNT', weight: 20 }, { enemyId: 'RUNNER', weight: 20 }, { enemyId: 'BRUTE', weight: 20 }, { enemyId: 'SWARM', weight: 20 }, { enemyId: 'SHIELDED', weight: 20 }], // Mixed
-    8: [{ enemyId: 'COREBREAKER', weight: 40 }, { enemyId: 'BRUTE', weight: 30 }, { enemyId: 'WARDED', weight: 30 }], // Elite
-    9: [{ enemyId: 'BRUTE', weight: 40 }, { enemyId: 'SHIELDED', weight: 40 }, { enemyId: 'COREBREAKER', weight: 20 }], // Mini-boss
-    10: [{ enemyId: 'COREBREAKER', weight: 40 }, { enemyId: 'BRUTE', weight: 20 }, { enemyId: 'SHIELDED', weight: 20 }, { enemyId: 'WARDED', weight: 20 }], // Special/Boss
+    8: [{ enemyId: 'COREBREAKER', weight: 30 }, { enemyId: 'BRUTE', weight: 20 }, { enemyId: 'WARDED', weight: 20 }, { enemyId: 'NEST', weight: 30 }],
+    9: [{ enemyId: 'BRUTE', weight: 30 }, { enemyId: 'SHIELDED', weight: 30 }, { enemyId: 'NEST', weight: 40 }],
+    10: [{ enemyId: 'NEST', weight: 50 }, { enemyId: 'COREBREAKER', weight: 20 }, { enemyId: 'SHIELDED', weight: 15 }, { enemyId: 'WARDED', weight: 15 }],
 };

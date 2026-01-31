@@ -43,7 +43,7 @@ export class GameLoop {
         // Cap max delta time to prevent spiral of death
         const safeDelta = Math.min(deltaTime, 100);
 
-        this.accumulator += safeDelta;
+        this.accumulator += safeDelta * this.state.speed;
 
         while (this.accumulator >= this.TIMESTEP) {
             this.update(this.TIMESTEP / 1000);

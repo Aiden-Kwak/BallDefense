@@ -66,5 +66,21 @@ export const ENEMIES: Record<string, EnemyData> = {
         baseStats: { hp: 40, speed: 2.4, armor: 0, mr: 0, reward: 3 },
         threatCost: 6,
     },
+    NEST: {
+        id: 'NEST',
+        name: 'Nest',
+        description: 'Colossal threat. Splits into 3 Tankers.',
+        baseStats: { hp: 650, speed: 0.5, armor: 35, mr: 20, reward: 25 },
+        threatCost: 60,
+        onDeathSplitsInto: { enemyId: 'TANKER', count: 3 },
+    },
+    TANKER: {
+        id: 'TANKER',
+        name: 'Tanker',
+        description: 'Heavily armored. Splits into 3 Runners.',
+        baseStats: { hp: 200, speed: 1.0, armor: 30, mr: 10, reward: 12 },
+        threatCost: 32,
+        onDeathSplitsInto: { enemyId: 'RUNNER', count: 3 },
+    },
 };
 

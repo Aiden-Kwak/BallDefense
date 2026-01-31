@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGameState } from '../hooks/useGameState';
 import { gameManager } from '../GameManager';
+import { t, Language } from '../data/translations';
 
 // Inline SVGs for lightweight icons
 const HeartIcon = () => (
@@ -23,6 +24,7 @@ const WaveIcon = () => (
 
 export default function HUD() {
     const state = useGameState();
+    const lang = state.language;
 
     const handleNextWave = () => {
         gameManager.loop.startNextWave();
@@ -34,46 +36,29 @@ export default function HUD() {
 
     return (
         <>
-            <div className="absolute top-0 left-0 w-full p-4 pointer-events-none flex justify-between items-start select-none z-10">
-                {/* Left: Wave only */}
-                <div className="flex flex-col gap-3 pointer-events-auto">
-                    <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3 min-w-[120px]">
-                        <WaveIcon />
-                        <div className="flex flex-col leading-none">
-                            <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">Defense Season {Math.ceil(state.wave / 10)}</span>
-                            <span className="text-xl font-black text-white">WAVE {state.wave % 10 || 10}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right: Gold, Lives & Controls */}
+            <div className="absolute top-0 right-0 w-full p-4 pointer-events-none flex justify-end items-start select-none z-[60]">
+                {/* Single Right Column for HUD */}
                 <div className="flex flex-col gap-3 pointer-events-auto items-end">
+
+                    {/* Top Row: Wave & Money/Lives */}
                     <div className="flex items-center gap-3">
-                        {/* WAVE STATUS / BUTTON */}
-                        {state.waveActive ? (
-                            <div className="bg-cyan-500/20 border border-cyan-400/30 py-2 px-6 rounded-2xl flex items-center justify-center shadow-xl animate-pulse">
-                                <span className="text-sm font-black text-cyan-400 tracking-widest uppercase">
-                                    WAVE {state.wave}
+                        {/* Wave Info */}
+                        <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3 min-w-[120px]">
+                            <WaveIcon />
+                            <div className="flex flex-col leading-none">
+                                <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider opacity-70">
+                                    {t('ui.season', lang)} {Math.ceil(state.wave / 10)}
+                                </span>
+                                <span className="text-xl font-black text-white">
+                                    {t('ui.wave', lang)} {state.wave % 10 || 10}
                                 </span>
                             </div>
-                        ) : (
-                            <button
-                                onClick={handleNextWave}
-                                className={`group relative overflow-hidden py-2 px-6 rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-xl border border-white/10
-                                ${state.wave === 1
-                                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400'
-                                        : 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400'}`}
-                            >
-                                <span className="text-sm font-black text-white tracking-widest uppercase truncate max-w-[100px]">
-                                    {state.wave === 1 ? 'START' : `WAVE ${state.wave}`}
-                                </span>
-                            </button>
-                        )}
+                        </div>
 
                         {/* Gold */}
                         <div className="bg-black/40 backdrop-blur-md border border-white/10 px-5 py-2 rounded-2xl shadow-xl flex items-center gap-3">
                             <div className="flex flex-col items-end leading-none">
-                                <span className="text-[10px] text-yellow-200 font-bold uppercase tracking-wider opacity-70">Treasury</span>
+                                <span className="text-[10px] text-yellow-200 font-bold uppercase tracking-wider opacity-70">{t('ui.treasury', lang)}</span>
                                 <span className="text-xl font-black text-yellow-400 tabular-nums">{state.gold}</span>
                             </div>
                             <GoldIcon />
@@ -83,43 +68,94 @@ export default function HUD() {
                         <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3">
                             <HeartIcon />
                             <div className="flex flex-col leading-none">
-                                <span className="text-[10px] text-rose-200 font-bold uppercase tracking-wider opacity-70">Lives</span>
+                                <span className="text-[10px] text-rose-200 font-bold uppercase tracking-wider opacity-70">{t('ui.lives', lang)}</span>
                                 <span className={`text-xl font-black ${state.lives < 5 ? 'text-rose-500 animate-pulse' : 'text-white'}`}>{state.lives}</span>
                             </div>
                         </div>
                     </div>
 
-                    <button
-                        onClick={handlePause}
-                        className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all active:scale-90"
-                    >
-                        {state.paused ? '▶' : 'II'}
-                    </button>
+                    {/* Second Row: Language & Control Row */}
+                    <div className="flex items-center gap-3">
+                        {/* Language Selector */}
+                        <div className="flex gap-1 bg-black/40 backdrop-blur-md p-1.5 rounded-xl border border-white/5">
+                            {(['ko', 'en', 'ja', 'zh', 'es'] as Language[]).map(l => (
+                                <button
+                                    key={l}
+                                    onClick={() => gameManager.setLanguage(l)}
+                                    className={`w-7 h-7 flex items-center justify-center rounded-lg text-[10px] font-bold transition-all
+                                    ${state.language === l ? 'bg-white text-black shadow-lg shadow-white/20' : 'text-white/40 hover:text-white/70 hover:bg-white/5'}`}
+                                >
+                                    {l.toUpperCase()}
+                                </button>
+                            ))}
+                        </div>
 
-                    <button
-                        onClick={() => window.location.reload()}
-                        className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 backdrop-blur-md border border-red-500/30 flex items-center justify-center text-red-200 transition-all active:scale-90"
-                        title="Restart Game"
-                    >
-                        ↻
-                    </button>
+                        {/* Speed/Wave/Pause Controls */}
+                        <div className="flex gap-2 items-center">
+                            {/* Wave Status/Button */}
+                            {state.waveActive ? (
+                                <div className="bg-cyan-500/20 border border-cyan-400/30 py-2 px-6 rounded-2xl flex items-center justify-center shadow-xl animate-pulse min-w-[100px]">
+                                    <span className="text-sm font-black text-cyan-400 tracking-widest uppercase">
+                                        {t('ui.wave', lang)} {state.wave}
+                                    </span>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={handleNextWave}
+                                    className={`group relative overflow-hidden py-2 px-6 rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-xl border border-white/10 min-w-[100px]
+                                    ${state.wave === 1
+                                            ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400'
+                                            : 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400'}`}
+                                >
+                                    <span className="text-sm font-black text-white tracking-widest uppercase truncate">
+                                        {state.wave === 1 ? t('ui.start', lang) : `${t('ui.wave', lang)} ${state.wave}`}
+                                    </span>
+                                </button>
+                            )}
+
+                            <button
+                                onClick={() => gameManager.toggleSpeed()}
+                                className={`w-10 h-10 rounded-xl backdrop-blur-md border flex items-center justify-center font-black text-xs transition-all active:scale-90
+                                ${state.speed === 2
+                                        ? 'bg-cyan-500/40 border-cyan-400/50 text-cyan-100 shadow-lg shadow-cyan-500/20'
+                                        : 'bg-white/10 border-white/10 text-white/70 hover:bg-white/20'}`}
+                                title={t('ui.speed', lang)}
+                            >
+                                {state.speed}x
+                            </button>
+
+                            <button
+                                onClick={handlePause}
+                                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all active:scale-90"
+                            >
+                                {state.paused ? '▶' : 'II'}
+                            </button>
+
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 backdrop-blur-md border border-red-500/30 flex items-center justify-center text-red-200 transition-all active:scale-90"
+                                title="Restart Game"
+                            >
+                                ↻
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            {/* Center Status / Start Button Area Removed */}
-
 
             {/* Game Over Overlay */}
             {state.lives <= 0 && (
                 <div className="absolute inset-0 z-[100] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-8 animate-fade-in pointer-events-auto">
-                    <div className="text-rose-500 text-7xl font-black tracking-tighter mb-4 drop-shadow-[0_0_30px_rgba(244,63,94,0.5)]">GAME OVER</div>
-                    <p className="text-slate-400 text-xl font-medium mb-12">Defense breached. Better luck next time.</p>
+                    <div className="text-rose-500 text-7xl font-black tracking-tighter mb-4 drop-shadow-[0_0_30px_rgba(244,63,94,0.5)]">
+                        {t('ui.gameOver', lang)}
+                    </div>
+                    <p className="text-slate-400 text-xl font-medium mb-12">{t('ui.breached', lang)}</p>
 
                     <button
                         onClick={() => window.location.reload()}
                         className="bg-white text-black font-black py-4 px-12 rounded-2xl hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-3 text-xl shadow-xl"
                     >
-                        <span>TRY AGAIN</span>
+                        <span>{t('ui.tryAgain', lang)}</span>
                         <span className="text-2xl">↻</span>
                     </button>
                 </div>
@@ -127,8 +163,18 @@ export default function HUD() {
 
             {/* Pause Overlay */}
             {state.paused && state.lives > 0 && (
-                <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-                    <div className="text-4xl font-black text-white tracking-widest uppercase drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">PAUSED</div>
+                <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-md flex flex-col items-center justify-center p-8 pointer-events-auto">
+                    <div className="text-white text-6xl font-black tracking-widest uppercase mb-12 drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
+                        {t('ui.paused', lang)}
+                    </div>
+
+                    <button
+                        onClick={handlePause}
+                        className="bg-white text-black font-black py-4 px-12 rounded-2xl hover:bg-cyan-100 transition-all active:scale-95 flex items-center gap-3 text-xl shadow-2xl"
+                    >
+                        <span>{t('ui.resume', lang)}</span>
+                        <span className="text-2xl font-normal">▶</span>
+                    </button>
                 </div>
             )}
         </>

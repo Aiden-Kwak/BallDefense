@@ -1,4 +1,5 @@
 import { MapData, Vector2D } from '../types';
+import { Language } from '../data/translations';
 
 export interface Entity {
     id: string; // Unique ID
@@ -99,6 +100,7 @@ export interface GameState {
     // Global Settings (Runtime, not saved maybe? But useful to save)
     speed: number;
     paused: boolean;
+    language: Language;
 }
 
 export const createInitialState = (map: MapData): GameState => ({
@@ -125,4 +127,5 @@ export const createInitialState = (map: MapData): GameState => ({
     effects: [],
     speed: 1,
     paused: false,
+    language: 'ko',
 });

@@ -6,6 +6,7 @@ import { MAPS } from './data/maps';
 import { TowerEntity } from './state/GameState';
 import { TOWERS } from './data/towers';
 import { audioSystem } from './systems/AudioSystem';
+import { Language } from './data/translations';
 
 export class GameManager {
     public state: GameState;
@@ -199,7 +200,12 @@ export class GameManager {
 
     public toggleSpeed() {
         this.state.speed = this.state.speed === 1 ? 2 : 1;
-        // Note: Logic needs to read this speed from loops
+        this.listeners.forEach(l => l(this.state, this.tickCount));
+    }
+
+    public setLanguage(lang: Language) {
+        this.state.language = lang;
+        this.listeners.forEach(l => l(this.state, this.tickCount));
     }
 
     public setPreview(towerId: string | null) {

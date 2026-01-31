@@ -1,7 +1,7 @@
 export type Vector2D = { x: number; y: number };
 
 // --- Enemy Types ---
-export type EnemyType = 'GRUNT' | 'RUNNER' | 'BRUTE' | 'WARDED' | 'SWARM' | 'MINI' | 'SHIELDED' | 'COREBREAKER' | 'DASHLING';
+export type EnemyType = 'GRUNT' | 'RUNNER' | 'BRUTE' | 'WARDED' | 'SWARM' | 'MINI' | 'SHIELDED' | 'COREBREAKER' | 'DASHLING' | 'NEST' | 'TANKER';
 
 export interface EnemyStats {
   hp: number;
