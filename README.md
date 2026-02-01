@@ -1,4 +1,4 @@
-# Ball Defense - 서버리스 타워 디펜스
+# Balix.io - 서버리스 타워 디펜스
 
 Next.js 14와 HTML5 Canvas로 제작된 상용 수준의 서버리스 타워 디펜스 게임입니다.
 

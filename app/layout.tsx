@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "../src/app/globals.css";
 
 export const metadata: Metadata = {
-    title: "Ball Defense",
+    title: "Balix.io",
     description: "Serverless Tower Defense Game",
     icons: {
         icon: "/favicon.svg",

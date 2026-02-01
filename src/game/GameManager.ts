@@ -18,7 +18,7 @@ export class GameManager {
     private tickCount = 0;
     private audioInitialized = false;
 
-    private static readonly STORAGE_KEY = 'ball-defense-best-stats';
+    private static readonly STORAGE_KEY = 'balix-io-best-stats';
 
     constructor() {
         this.state = createInitialState(MAPS[0]);
