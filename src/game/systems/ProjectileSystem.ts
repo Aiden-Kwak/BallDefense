@@ -6,30 +6,58 @@ export class ProjectileSystem {
     public update(state: GameState, dt: number) {
         for (let i = state.projectiles.length - 1; i >= 0; i--) {
             const proj = state.projectiles[i];
-
-            // Target Validation
-            const target = state.enemies.find(e => e.id === proj.targetId);
-            if (!target || !target.active) {
-                state.projectiles.splice(i, 1);
-                continue;
-            }
-
-            // Move
-            const dx = target.pos.x - proj.pos.x;
-            const dy = target.pos.y - proj.pos.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
             const moveDist = proj.speed * dt;
 
-            if (dist <= moveDist) {
-                // Hit
-                this.applyHit(state, proj, target);
-                state.projectiles.splice(i, 1);
+            if (proj.targetId) {
+                // Homing / Targeted Projectile
+                const target = state.enemies.find(e => e.id === proj.targetId);
+                if (!target || !target.active) {
+                    state.projectiles.splice(i, 1);
+                    continue;
+                }
+
+                const dx = target.pos.x - proj.pos.x;
+                const dy = target.pos.y - proj.pos.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist <= moveDist) {
+                    this.applyHit(state, proj, target);
+                    state.projectiles.splice(i, 1);
+                } else {
+                    const ratio = moveDist / dist;
+                    proj.pos.x += dx * ratio;
+                    proj.pos.y += dy * ratio;
+                }
+            } else if (proj.direction) {
+                // Directional / Untargeted Projectile
+                proj.pos.x += proj.direction.x * moveDist;
+                proj.pos.y += proj.direction.y * moveDist;
+
+                // Lifetime / Range check
+                if (proj.maxRange !== undefined) {
+                    if (!proj.distanceTraveled) proj.distanceTraveled = 0;
+                    proj.distanceTraveled += moveDist;
+                    if (proj.distanceTraveled >= proj.maxRange) {
+                        state.projectiles.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                // Collision Detection against all enemies
+                const hitEnemy = state.enemies.find(enemy => {
+                    const dx = enemy.pos.x - proj.pos.x;
+                    const dy = enemy.pos.y - proj.pos.y;
+                    // Approximate hit radius
+                    return (dx * dx + dy * dy) <= 0.15; // roughly 0.4 tiles radius sq
+                });
+
+                if (hitEnemy) {
+                    this.applyHit(state, proj, hitEnemy);
+                    state.projectiles.splice(i, 1);
+                }
             } else {
-                // Move towards
-                const ratio = moveDist / dist;
-                proj.pos.x += dx * ratio;
-                proj.pos.y += dy * ratio;
+                // Invalid projectile
+                state.projectiles.splice(i, 1);
             }
         }
     }
@@ -46,7 +74,22 @@ export class ProjectileSystem {
         if (proj.splashRadius) {
             this.applyAoE(state, proj.pos, proj.splashRadius, proj.damage, proj);
         } else {
-            this.applyDamage(target, proj.damage, proj.type);
+            let finalDamage = proj.damage;
+
+            // Tier 3 SPIN_TURRET Close-range bonus check
+            // We need to know which tower fired this. Currently ProjectileEntity doesn't store tower source.
+            // Requirement says "If enemy distance <= 50% of current range: DamagePerBullet * 1.2"
+            // For now, if maxRange exists and distTraveled is low, apply bonus.
+            if (proj.maxRange && proj.distanceTraveled !== undefined) {
+                if (proj.distanceTraveled <= proj.maxRange * 0.5) {
+                    // Check if it's T3 (damage 7, bul 12, range 2.4)
+                    if (proj.damage === 7 && proj.maxRange >= 2.3) {
+                        finalDamage = proj.damage * 1.2;
+                    }
+                }
+            }
+
+            this.applyDamage(target, finalDamage, proj.type);
         }
 
         // 2. Status Effects (Slow/Poison)

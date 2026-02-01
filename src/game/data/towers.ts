@@ -177,5 +177,27 @@ export const TOWERS: Record<string, TowerData> = {
             },
         ],
     },
+    SPIN_TURRET: {
+        id: 'SPIN_TURRET',
+        name: 'Spin Turret',
+        unlockWave: 5,
+        tiers: [
+            {
+                tier: 1,
+                stats: { cost: 70, range: 2.2, fireRate: 0.83, damage: 6, type: 'PHYSICAL', bulletsPerCycle: 8 },
+                description: 'Fires bullets in all directions.'
+            },
+            {
+                tier: 2,
+                stats: { cost: 95, range: 2.3, fireRate: 0.91, damage: 7, type: 'PHYSICAL', bulletsPerCycle: 10 },
+                description: 'More bullets and increased range.'
+            },
+            {
+                tier: 3,
+                stats: { cost: 130, range: 2.4, fireRate: 1.0, damage: 7, type: 'PHYSICAL', bulletsPerCycle: 12 },
+                description: '360° pressure. Bonus damage at close range.'
+            },
+        ],
+    },
 };
 

@@ -22,9 +22,18 @@ export class TowerSystem {
             }
 
             // Fire
-            if (tower.targetId && tower.cooldown <= 0) {
-                this.fire(state, tower, stats.damage, tower.targetId, stats);
-                tower.cooldown = 1 / stats.fireRate;
+            if (tower.cooldown <= 0) {
+                if (tower.typeId === 'SPIN_TURRET') {
+                    // Spin Turret fires even without a specific target if any enemy is in range
+                    const anyTargetId = tower.targetId || this.findTarget(state, tower.pos, stats.range);
+                    if (anyTargetId) {
+                        this.fireRadial(state, tower, stats.damage, stats);
+                        tower.cooldown = 1 / stats.fireRate;
+                    }
+                } else if (tower.targetId) {
+                    this.fire(state, tower, stats.damage, tower.targetId, stats);
+                    tower.cooldown = 1 / stats.fireRate;
+                }
             }
         }
     }
@@ -79,6 +88,32 @@ export class TowerSystem {
         };
 
         state.projectiles.push(proj);
+    }
+
+    private fireRadial(state: GameState, tower: TowerEntity, damage: number, stats: any) {
+        // SFX
+        audioSystem.playShoot(tower.typeId);
+
+        const bullets = stats.bulletsPerCycle || 8;
+        const angleStep = (Math.PI * 2) / bullets;
+
+        for (let i = 0; i < bullets; i++) {
+            const angle = i * angleStep;
+            const direction = { x: Math.cos(angle), y: Math.sin(angle) };
+
+            const proj: ProjectileEntity = {
+                id: Math.random().toString(36),
+                pos: { ...tower.pos },
+                active: true,
+                type: 'ARROW', // Blue streak visual in Renderer
+                direction: direction,
+                maxRange: stats.range,
+                speed: stats.range / 0.4, // reach max range in roughly 0.4s
+                damage: damage,
+            };
+
+            state.projectiles.push(proj);
+        }
     }
 
     private getProjectileType(towerId: string): any {

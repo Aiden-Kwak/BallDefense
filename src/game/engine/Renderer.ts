@@ -390,7 +390,7 @@ export class Renderer {
             ctx.shadowColor = this.getTowerColor(tower.typeId);
             ctx.shadowBlur = 10;
 
-            this.drawTowerShape(ctx, cx, cy, tower.typeId);
+            this.drawTowerShape(ctx, cx, cy, tower.typeId, state);
 
             ctx.shadowBlur = 0;
 
@@ -404,7 +404,7 @@ export class Renderer {
         }
     }
 
-    private drawTowerShape(ctx: CanvasRenderingContext2D, cx: number, cy: number, typeId: string) {
+    private drawTowerShape(ctx: CanvasRenderingContext2D, cx: number, cy: number, typeId: string, state: GameState) {
         ctx.beginPath();
         switch (typeId) {
             case 'ARROW': // Triangle
@@ -451,6 +451,63 @@ export class Renderer {
                 ctx.lineTo(cx + 5, cy + 3);
                 ctx.closePath();
                 break;
+            case 'SPIN_TURRET': {
+                const tower = state.towers.find(t =>
+                    Math.abs(t.pos.x * TILE_SIZE + TILE_SIZE / 2 - cx) < 1 &&
+                    Math.abs(t.pos.y * TILE_SIZE + TILE_SIZE / 2 - cy) < 1
+                );
+
+                const time = Date.now() / 1000;
+                // Base rotation: 1 rev / 4s
+                // Attack boost: increase speed briefly if cooldown is high
+                let rotationSpeed = 1.5;
+                if (tower && tower.cooldown > 0) {
+                    const stats = TOWERS[tower.typeId].tiers[tower.tier - 1].stats;
+                    const maxCd = 1 / stats.fireRate;
+                    if (tower.cooldown > maxCd * 0.8) rotationSpeed = 12; // Fast spin on fire
+                }
+
+                const angle = time * rotationSpeed;
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(angle);
+
+                // Circular Gear Body (Metallic Gray)
+                ctx.fillStyle = '#475569'; // Slate-600
+                ctx.beginPath();
+                ctx.arc(0, 0, 16, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Saw Teeth (Blue Tips)
+                const teethCount = 12;
+                ctx.fillStyle = '#3b82f6'; // Blue-500
+                for (let i = 0; i < teethCount; i++) {
+                    const toothAngle = (i * Math.PI * 2) / teethCount;
+                    ctx.save();
+                    ctx.rotate(toothAngle);
+                    ctx.beginPath();
+                    ctx.moveTo(14, -3);
+                    ctx.lineTo(20, 0); // Tip
+                    ctx.lineTo(14, 3);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                // Center Core
+                ctx.fillStyle = COLORS.bg;
+                ctx.beginPath();
+                ctx.arc(0, 0, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#22d3ee'; // Cyan-400 core
+                ctx.beginPath();
+                ctx.arc(0, 0, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+                return; // Shape is fully drawn here
+            }
             default:
                 ctx.arc(cx, cy, 14, 0, Math.PI * 2);
         }

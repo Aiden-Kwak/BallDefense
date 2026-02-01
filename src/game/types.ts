@@ -22,7 +22,7 @@ export interface EnemyData {
 }
 
 // --- Tower Types ---
-export type TowerType = 'ARROW' | 'CANNON' | 'FROST' | 'ARCANE' | 'POISON' | 'TESLA' | 'SNIPER' | 'STICKY';
+export type TowerType = 'ARROW' | 'CANNON' | 'FROST' | 'ARCANE' | 'POISON' | 'TESLA' | 'SNIPER' | 'STICKY' | 'SPIN_TURRET';
 export type DamageType = 'PHYSICAL' | 'MAGIC';
 
 export interface TowerStats {
@@ -45,6 +45,7 @@ export interface TowerStats {
   chainReduction?: number; // reduction per jump (e.g. 0.7 for 70% of previous)
   markBonus?: number; // damage multiplier
   armorShred?: number; // flat armor reduction
+  bulletsPerCycle?: number;
 }
 
 export interface TowerTier {

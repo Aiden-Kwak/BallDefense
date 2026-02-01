@@ -38,6 +38,9 @@ export interface ProjectileEntity extends Entity {
     type: 'ARROW' | 'CANNON' | 'MAGIC' | 'POISON';
     targetId?: string;
     targetPos?: Vector2D;
+    direction?: Vector2D;
+    maxRange?: number;
+    distanceTraveled?: number;
     speed: number;
     damage: number;
     splashRadius?: number;

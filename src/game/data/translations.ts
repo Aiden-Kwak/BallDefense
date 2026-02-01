@@ -54,6 +54,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.TESLA': '테슬라 탑',
         'tower.SNIPER': '스나이퍼 탑',
         'tower.STICKY': '끈끈이 탑',
+        'tower.SPIN_TURRET': '회전 터렛',
         'tower.desc.ARROW': '기본적인 물리 공격을 합니다.',
         'tower.desc.CANNON': '강력한 범위 피해를 입힙니다.',
         'tower.desc.FROST': '적을 느리게 만듭니다.',
@@ -62,6 +63,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.desc.TESLA': '여러 적을 동시에 타격합니다.',
         'tower.desc.SNIPER': '먼 거리에서 치명적인 타격을 입힙니다.',
         'tower.desc.STICKY': '적들을 한곳에 묶어둡니다.',
+        'tower.desc.SPIN_TURRET': '사방으로 탄환을 발사하여 광범위한 압박을 가합니다.',
     },
     en: {
         'ui.season': 'Defense Season',
@@ -116,6 +118,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.TESLA': 'Tesla Tower',
         'tower.SNIPER': 'Sniper Tower',
         'tower.STICKY': 'Sticky Tower',
+        'tower.SPIN_TURRET': 'Spin Turret',
         'tower.desc.ARROW': 'Basic physical attacks.',
         'tower.desc.CANNON': 'Strong AoE damage.',
         'tower.desc.FROST': 'Slows down enemies.',
@@ -124,6 +127,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.desc.TESLA': 'Strikes multiple enemies.',
         'tower.desc.SNIPER': 'Deals heavy damage from afar.',
         'tower.desc.STICKY': 'Keeps enemies grouped together.',
+        'tower.desc.SPIN_TURRET': 'Fires bullets in all directions for area pressure.',
     },
     ja: {
         'ui.season': '防衛シーズン',
@@ -178,6 +182,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.TESLA': 'テスラの塔',
         'tower.SNIPER': '狙撃の塔',
         'tower.STICKY': '粘着の塔',
+        'tower.SPIN_TURRET': '回転ターレット',
         'tower.desc.ARROW': '基本的な物理攻撃を行います。',
         'tower.desc.CANNON': '強力な範囲ダメージを与えます。',
         'tower.desc.FROST': '敵の速度を低下させます。',
@@ -186,6 +191,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.desc.TESLA': '複数の敵を同時に攻撃します。',
         'tower.desc.SNIPER': '遠距離から致命的なダメージを与えます。',
         'tower.desc.STICKY': '敵を足止めします。',
+        'tower.desc.SPIN_TURRET': '全方向に弾丸を発射し、広範囲に圧力をかけます。',
     },
     zh: {
         'ui.season': '防卫赛季',
@@ -240,6 +246,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.TESLA': '特斯拉塔',
         'tower.SNIPER': '狙击塔',
         'tower.STICKY': '粘滞塔',
+        'tower.SPIN_TURRET': '旋转炮塔',
         'tower.desc.ARROW': '基础物理攻击。',
         'tower.desc.CANNON': '强力范围伤害。',
         'tower.desc.FROST': '减缓敌人速度。',
@@ -248,6 +255,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.desc.TESLA': '同时打击多个敌人。',
         'tower.desc.SNIPER': '远距离致命打击。',
         'tower.desc.STICKY': '使敌人聚集在一起。',
+        'tower.desc.SPIN_TURRET': '向四面八方发射子弹，产生区域压力。',
     },
     es: {
         'ui.season': 'Temporada',
@@ -302,6 +310,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.TESLA': 'Torre Tesla',
         'tower.SNIPER': 'Torre Sniper',
         'tower.STICKY': 'Torre Pegajosa',
+        'tower.SPIN_TURRET': 'Torreta Giratoria',
         'tower.desc.ARROW': 'Ataques físicos básicos.',
         'tower.desc.CANNON': 'Daño explosivo en área.',
         'tower.desc.FROST': 'Ralentiza a los enemigos.',
@@ -310,6 +319,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         'tower.desc.TESLA': 'Ataca a múltiples enemigos.',
         'tower.desc.SNIPER': 'Daño letal desde lejos.',
         'tower.desc.STICKY': 'Mantiene a los enemigos agrupados.',
+        'tower.desc.SPIN_TURRET': 'Dispara balas en todas direcciones para presionar el área.',
     },
 };
 
