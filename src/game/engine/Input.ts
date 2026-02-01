@@ -111,17 +111,27 @@ export class InputHandler {
         const canvasX = (screenX - rect.left) * scaleX;
         const canvasY = (screenY - rect.top) * scaleY;
 
-        const { state } = this;
-        const SIDEBAR_WIDTH = 260;
-        const boardW = state.map.width * TILE_SIZE;
-        const boardH = state.map.height * TILE_SIZE;
-        const playableW = canvasW - SIDEBAR_WIDTH;
+        const cssThreshold = 1024;
+        const isDesktop = window.innerWidth >= cssThreshold;
+        const dpr = window.devicePixelRatio || 1;
 
-        const paddingX = SIDEBAR_WIDTH + (playableW - boardW) / 2;
-        const paddingY = (canvasH - boardH) / 2;
+        const SIDEBAR_WIDTH = isDesktop ? 240 : 0;
+        const BOTTOM_HEIGHT = isDesktop ? 0 : 120;
 
-        const worldX = canvasX - paddingX;
-        const worldY = canvasY - paddingY;
+        const playableW = canvasW - (SIDEBAR_WIDTH * dpr);
+        const playableH = canvasH - (BOTTOM_HEIGHT * dpr);
+
+        const boardW = this.state.map.width * TILE_SIZE;
+        const boardH = this.state.map.height * TILE_SIZE;
+
+        // Auto-scale to fit
+        const scale = Math.min(playableW / boardW, playableH / boardH, 1);
+
+        const paddingX = (SIDEBAR_WIDTH * dpr) + (playableW - boardW * scale) / 2;
+        const paddingY = (playableH - boardH * scale) / 2;
+
+        const worldX = (canvasX - paddingX) / scale;
+        const worldY = (canvasY - paddingY) / scale;
 
         const tileX = Math.floor(worldX / TILE_SIZE);
         const tileY = Math.floor(worldY / TILE_SIZE);

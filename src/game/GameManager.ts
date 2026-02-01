@@ -114,6 +114,10 @@ export class GameManager {
             this.listeners.forEach(l => l(this.state, this.tickCount));
         }
     }
+    public setSelection(selection: { tile: { x: number, y: number }, towerId?: string } | null) {
+        this.state.selection = selection;
+        this.listeners.forEach(l => l(this.state, this.tickCount));
+    }
 
     public buildTower(towerId: string) {
         this.ensureAudio();

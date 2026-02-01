@@ -37,16 +37,28 @@ export class Renderer {
 
         ctx.save();
 
-        // Layout Layout
-        const SIDEBAR_WIDTH = 260; // Sidebar on Left
-        const playableW = width - SIDEBAR_WIDTH;
+        // Responsive Layout Calculation
+        const cssThreshold = 1024;
+        const isDesktop = window.innerWidth >= cssThreshold;
+
+        const SIDEBAR_WIDTH = isDesktop ? 240 : 0;
+        const BOTTOM_HEIGHT = isDesktop ? 0 : 120; // Should match HUD.tsx bottom panel
+
+        const playableW = width - (SIDEBAR_WIDTH * (window.devicePixelRatio || 1));
+        const playableH = height - (BOTTOM_HEIGHT * (window.devicePixelRatio || 1));
+
         const boardW = map.width * TILE_SIZE;
         const boardH = map.height * TILE_SIZE;
 
-        const paddingX = SIDEBAR_WIDTH + (playableW - boardW) / 2;
-        const paddingY = (height - boardH) / 2;
+        // Auto-scale to fit playable area
+        const scale = Math.min(playableW / boardW, playableH / boardH, 1);
+
+        // Centering
+        const paddingX = (SIDEBAR_WIDTH * (window.devicePixelRatio || 1)) + (playableW - boardW * scale) / 2;
+        const paddingY = (playableH - boardH * scale) / 2;
 
         ctx.translate(paddingX, paddingY);
+        ctx.scale(scale, scale);
 
         // Draw Map Layers
         this.drawGrid(state);

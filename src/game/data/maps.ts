@@ -69,7 +69,7 @@ const map1Waypoints: Vector2D[] = [
 ];
 const map1Grid = createGrid(WIDTH, HEIGHT);
 applyPath(map1Grid, map1Waypoints);
-applyRandomBlocks(map1Grid, 20);
+applyRandomBlocks(map1Grid, 25);
 
 
 // --- Map 2: Split & Merge ---
@@ -124,7 +124,7 @@ const map2Waypoints: Vector2D[] = [
 ];
 const map2Grid = createGrid(WIDTH, HEIGHT);
 applyPath(map2Grid, map2Waypoints);
-applyRandomBlocks(map2Grid, 20);
+applyRandomBlocks(map2Grid, 25);
 
 
 // --- Map 3: Long Spiral ---
@@ -141,7 +141,7 @@ const map3Waypoints: Vector2D[] = [
 ];
 const map3Grid = createGrid(WIDTH, HEIGHT);
 applyPath(map3Grid, map3Waypoints);
-applyRandomBlocks(map3Grid, 20);
+applyRandomBlocks(map3Grid, 25);
 
 
 export const MAPS: MapData[] = [
