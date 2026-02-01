@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { gameManager } from '@/game/GameManager';
 import HUD from '@/game/ui/HUD';
 import TowerControls from '@/game/ui/TowerControls';
+import AdUnit from '@/game/ui/AdUnit';
 
 export default function GamePage() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -58,6 +59,14 @@ export default function GamePage() {
 
             <HUD />
             <TowerControls />
+
+            {/* Vertical Ad Unit (Right Gutter on wide screens) */}
+            <div className="fixed top-24 bottom-4 right-4 z-40 hidden xl:flex flex-col w-[160px] pointer-events-auto bg-black/20 border border-white/5 rounded-xl overflow-hidden backdrop-blur-sm">
+                <div className="p-1 text-[8px] font-bold text-slate-500 uppercase tracking-widest text-center border-b border-white/5">Advertisement</div>
+                <div className="flex-1 flex items-center justify-center p-2">
+                    <AdUnit adSlot="7585529595" adFormat="auto" />
+                </div>
+            </div>
         </div>
     );
 }
