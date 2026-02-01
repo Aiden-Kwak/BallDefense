@@ -17,18 +17,27 @@ const AdUnit: React.FC<AdUnitProps> = ({
     style = { display: 'block' },
     className = ""
 }) => {
+    const adRef = React.useRef<HTMLModElement>(null);
+
     useEffect(() => {
-        try {
-            // @ts-ignore
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (err) {
-            console.error('AdSense error:', err);
-        }
+        // Wait for next tick to ensure layout is calculated
+        const timer = setTimeout(() => {
+            if (adRef.current && adRef.current.offsetWidth > 0) {
+                try {
+                    // @ts-ignore
+                    (window.adsbygoogle = window.adsbygoogle || []).push({});
+                } catch (err) {
+                    console.error('AdSense error:', err);
+                }
+            }
+        }, 100);
+        return () => clearTimeout(timer);
     }, []);
 
     return (
-        <div className={`ad-container ${className}`} style={{ minWidth: '160px', minHeight: '100px' }}>
+        <div className={`ad-container ${className}`} style={{ minWidth: '160px' }}>
             <ins
+                ref={adRef}
                 className="adsbygoogle"
                 style={style}
                 data-ad-client="ca-pub-5536083857370761"
