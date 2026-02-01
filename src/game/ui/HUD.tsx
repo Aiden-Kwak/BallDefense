@@ -41,6 +41,22 @@ const TowerShape = ({ type, color }: { type: string, color: string }) => {
         case 'TESLA': return <svg viewBox="0 0 40 40" className="w-full h-full"><path d="M15 5 L25 18 L18 18 L28 35 L12 21 L19 21 Z" fill={color} stroke="white" strokeWidth="1" /></svg>;
         case 'SNIPER': return <svg viewBox="0 0 40 40" className="w-full h-full"><circle cx="20" cy="20" r="14" fill={color} stroke="white" strokeWidth="1" /><line x1="20" y1="6" x2="20" y2="34" stroke="white" strokeWidth="1" opacity="0.5" /><line x1="6" y1="20" x2="34" y2="20" stroke="white" strokeWidth="1" opacity="0.5" /></svg>;
         case 'STICKY': return <svg viewBox="0 0 40 40" className="w-full h-full"><circle cx="20" cy="20" r="13" fill={color} stroke="white" strokeWidth="1" /><circle cx="20" cy="20" r="8" fill="rgba(255,255,255,0.2)" /></svg>;
+        case 'SPIN_TURRET':
+            return (
+                <svg viewBox="0 0 100 100" className="w-full h-full p-1 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+                    <circle cx="50" cy="50" r="35" fill="#475569" stroke="white" strokeWidth="2" />
+                    {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+                        <path
+                            key={angle}
+                            d="M50 15 L58 35 L42 35 Z"
+                            fill="#3b82f6"
+                            transform={`rotate(${angle} 50 50)`}
+                        />
+                    ))}
+                    <circle cx="50" cy="50" r="10" fill="#0f172a" />
+                    <circle cx="50" cy="50" r="5" fill="#22d3ee" />
+                </svg>
+            );
         default: return null;
     }
 };
@@ -53,6 +69,7 @@ const getTowerColor = (typeId: string): string => {
         case 'POISON': return '#10b981';
         case 'ARCANE': return '#a855f7';
         case 'TESLA': return '#fbbf24';
+        case 'SPIN_TURRET': return '#475569';
         default: return '#94a3b8';
     }
 };

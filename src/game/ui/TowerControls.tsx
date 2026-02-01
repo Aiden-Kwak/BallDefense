@@ -59,6 +59,22 @@ const TowerIcon = ({ type, color }: { type: string, color: string }) => {
                     <circle cx="20" cy="20" r="8" fill="rgba(255,255,255,0.2)" />
                 </svg>
             );
+        case 'SPIN_TURRET':
+            return (
+                <svg viewBox="0 0 100 100" className="w-full h-full p-1 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+                    <circle cx="50" cy="50" r="35" fill="#475569" stroke="white" strokeWidth="2" />
+                    {[...Array(8)].map((_, i) => (
+                        <path
+                            key={i}
+                            d="M50 15 L58 35 L42 35 Z"
+                            fill="#3b82f6"
+                            transform={`rotate(${i * 45} 50 50)`}
+                        />
+                    ))}
+                    <circle cx="50" cy="50" r="10" fill="#0f172a" />
+                    <circle cx="50" cy="50" r="5" fill="#22d3ee" />
+                </svg>
+            );
         default:
             return <div className="w-full h-full bg-slate-700 rounded-full" />;
     }
@@ -72,6 +88,7 @@ const getTowerColor = (typeId: string): string => {
         case 'POISON': return '#10b981';
         case 'ARCANE': return '#a855f7';
         case 'TESLA': return '#fbbf24';
+        case 'SPIN_TURRET': return '#475569';
         default: return '#94a3b8';
     }
 };
