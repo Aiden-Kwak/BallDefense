@@ -22,19 +22,13 @@ export function useGameState(): GameState {
 
     useEffect(() => {
         const onTick = (newState: GameState, tick: number) => {
-            // Log to verify callback is being called
-            if (tick % 60 === 0) {
-                console.log('[useGameState] Gold:', newState.gold, 'Lives:', newState.lives, 'Tick:', tick);
-            }
             // Dispatch new state to force re-render
             dispatch(newState);
         };
 
-        console.log('[useGameState] Subscribing to game state updates');
         gameManager.subscribe(onTick);
 
         return () => {
-            console.log('[useGameState] Unsubscribing from game state updates');
             gameManager.unsubscribe(onTick);
         };
     }, []);

@@ -20,17 +20,26 @@ const AdUnit: React.FC<AdUnitProps> = ({
     const adRef = React.useRef<HTMLModElement>(null);
 
     useEffect(() => {
-        // Wait for next tick to ensure layout is calculated
-        const timer = setTimeout(() => {
+        // Wait for layout to be settled
+        let attempts = 0;
+        const maxAttempts = 5;
+
+        const tryPush = () => {
             if (adRef.current && adRef.current.offsetWidth > 0) {
                 try {
                     // @ts-ignore
                     (window.adsbygoogle = window.adsbygoogle || []).push({});
                 } catch (err) {
-                    console.error('AdSense error:', err);
+                    // Fail silently or log once
+                    if (attempts === 0) console.warn('AdSense initial push failed, retrying...', err);
                 }
+            } else if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(tryPush, 200); // Retry after 200ms
             }
-        }, 100);
+        };
+
+        const timer = setTimeout(tryPush, 300);
         return () => clearTimeout(timer);
     }, []);
 
