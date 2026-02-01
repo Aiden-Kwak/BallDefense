@@ -103,11 +103,11 @@ export default function TowerControls() {
             const handleUpgrade = () => gameManager.upgradeTower();
             const handleSell = () => gameManager.sellTower();
 
-            const sellCost = Math.floor((
+            const refund = Math.floor((
                 data.tiers[0].stats.cost +
                 (tower.tier >= 2 ? data.tiers[1].stats.cost : 0) +
                 (tower.tier >= 3 ? data.tiers[2].stats.cost : 0)
-            ) * 0.3);
+            ) * 0.5);
 
             return (
                 <div className="flex flex-col h-full animate-fade-in w-full">
@@ -164,7 +164,7 @@ export default function TowerControls() {
                             className="flex-1 py-1.5 lg:py-3 px-3 rounded-lg font-bold bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-between"
                         >
                             <span className="text-[10px] lg:text-base">{t('ui.sell', lang).toUpperCase()}</span>
-                            <span className="opacity-70 text-[9px] lg:text-sm ml-2">-{sellCost}G</span>
+                            <span className="opacity-70 text-[9px] lg:text-sm ml-2">+{refund}G</span>
                         </button>
                     </div>
                 </div>

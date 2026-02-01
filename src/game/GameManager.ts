@@ -18,9 +18,57 @@ export class GameManager {
     private tickCount = 0;
     private audioInitialized = false;
 
+    private static readonly STORAGE_KEY = 'ball-defense-best-stats';
+
     constructor() {
         this.state = createInitialState(MAPS[0]);
+        this.loadBestStats();
         this.loop = new GameLoop(this.state, this.onRender.bind(this));
+    }
+
+    private loadBestStats() {
+        if (typeof window === 'undefined') return;
+        try {
+            const saved = localStorage.getItem(GameManager.STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                this.state.bestStats = {
+                    wave: parsed.wave || 0,
+                    enemiesKilled: parsed.enemiesKilled || 0
+                };
+            }
+        } catch (e) {
+            console.error("Failed to load records:", e);
+        }
+    }
+
+    private saveBestStats() {
+        if (typeof window === 'undefined') return;
+        try {
+            localStorage.setItem(GameManager.STORAGE_KEY, JSON.stringify(this.state.bestStats));
+        } catch (e) {
+            console.error("Failed to save records:", e);
+        }
+    }
+
+    public recordKill() {
+        this.state.stats.enemiesKilled++;
+
+        // Update best kills if broken
+        if (this.state.stats.enemiesKilled > this.state.bestStats.enemiesKilled) {
+            this.state.bestStats.enemiesKilled = this.state.stats.enemiesKilled;
+            this.saveBestStats();
+        }
+
+        this.listeners.forEach(l => l(this.state, this.tickCount));
+    }
+
+    public recordWave(wave: number) {
+        if (wave > this.state.bestStats.wave) {
+            this.state.bestStats.wave = wave;
+            this.saveBestStats();
+            this.listeners.forEach(l => l(this.state, this.tickCount));
+        }
     }
 
     public init(canvas: HTMLCanvasElement) {
@@ -184,9 +232,9 @@ export class GameManager {
         if (tower.tier >= 2) totalSpent += data.tiers[1].stats.cost;
         if (tower.tier >= 3) totalSpent += data.tiers[2].stats.cost;
 
-        const cost = Math.floor(totalSpent * 0.3); // 30% of total investment as demolition cost
+        const refund = Math.floor(totalSpent * 0.5);
 
-        this.state.gold -= cost;
+        this.state.gold += refund;
         this.state.towers.splice(index, 1);
         this.state.selection = null;
         this.listeners.forEach(l => l(this.state, this.tickCount));

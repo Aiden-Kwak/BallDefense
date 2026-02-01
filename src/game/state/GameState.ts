@@ -101,6 +101,15 @@ export interface GameState {
     speed: number;
     paused: boolean;
     language: Language;
+
+    // Statistics
+    stats: {
+        enemiesKilled: number;
+    };
+    bestStats: {
+        wave: number;
+        enemiesKilled: number;
+    };
 }
 
 export const createInitialState = (map: MapData): GameState => ({
@@ -128,4 +137,11 @@ export const createInitialState = (map: MapData): GameState => ({
     speed: 1,
     paused: false,
     language: 'ko',
+    stats: {
+        enemiesKilled: 0,
+    },
+    bestStats: {
+        wave: 0,
+        enemiesKilled: 0,
+    },
 });

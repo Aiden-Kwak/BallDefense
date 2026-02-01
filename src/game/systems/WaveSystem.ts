@@ -3,6 +3,7 @@ import { WAVE_SCALING, SLOT_POOLS, EnemyPoolWeight } from '../data/waves';
 import { ENEMIES } from '../data/enemies';
 import { EnemyEntity } from '../state/GameState';
 import { WaveSegment, EnemyType } from '../types';
+import { gameManager } from '../GameManager';
 
 export class WaveSystem {
     public update(state: GameState, dt: number) {
@@ -92,6 +93,7 @@ export class WaveSystem {
     private endWave(state: GameState) {
         state.waveActive = false;
         state.wave++;
+        gameManager.recordWave(state.wave - 1); // Record the completed wave
 
         // Start Intermission
         state.waveState.intermissionTimer = 0.5;

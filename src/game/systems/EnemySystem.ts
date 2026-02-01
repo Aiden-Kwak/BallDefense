@@ -3,6 +3,7 @@ import { Vector2D, EnemyType } from '../types';
 import { ENEMIES } from '../data/enemies';
 import { WAVE_SCALING } from '../data/waves';
 import { audioSystem } from './AudioSystem';
+import { gameManager } from '../GameManager';
 
 export class EnemySystem {
     public update(state: GameState, dt: number) {
@@ -24,6 +25,7 @@ export class EnemySystem {
                 audioSystem.playExplosion();
 
                 state.gold += Math.round(enemy.reward || 5);
+                gameManager.recordKill();
 
                 // Generalized Splitting Logic
                 const data = ENEMIES[enemy.typeId];
